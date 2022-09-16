@@ -88,21 +88,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// create a decorator type that we use to decorate small numbers
 	const activeTaskDecorationType = vscode.window.createTextEditorDecorationType({
-		borderWidth: '1px',
-		borderStyle: 'solid',
 		overviewRulerColor: 'blue',
 		overviewRulerLane: vscode.OverviewRulerLane.Right,
-		light: {
-			// this color will be used in light color themes
-			borderColor: 'darkblue'
-		},
-		dark: {
-			// this color will be used in dark color themes
-			borderColor: 'lightblue'
-		},
 		after: {
             contentText: 'active',
-            color: 'rgba(153, 153, 153)',
+            color: 'green',
           },
 	});
 
