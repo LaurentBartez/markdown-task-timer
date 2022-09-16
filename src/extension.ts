@@ -129,7 +129,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		tasks.forEach(element => {
 			if (element.isActive){
-				const decoration = { range: element.getRange, hoverMessage: element.getInfo};
+				const decoration = { range: element.getRange};
 				taskDeco.push(decoration);		
 			}	
 			
@@ -166,6 +166,28 @@ export function activate(context: vscode.ExtensionContext) {
 			triggerUpdateDecorations(true);
 		}
 	}, null, context.subscriptions);
+
+	vscode.languages.registerHoverProvider('markdown', {
+        provideHover(document, position, token) {
+			if (!activeEditor) {
+				return;
+			}
+			const regEx = /- \[x\]|- \[ \]/g;
+			
+			let match;
+			while ((match = regEx.exec(document.lineAt(position).text))) {
+				
+				const range = document.lineAt(position).range;
+				const startPos = activeEditor.document.positionAt(match.index);
+				const endPos = activeEditor.document.lineAt(startPos).range.end;
+	
+				var task = new Task(activeEditor,range);
+				return new vscode.Hover(task.getInfo,range)
+			}
+
+
+        }
+    });
 	handleTimer();
 
 }

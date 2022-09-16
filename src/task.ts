@@ -1,6 +1,12 @@
 import * as vscode from 'vscode';
 import * as moment from 'moment';
+import { table } from 'console';
 
+interface timeEntry {
+    start: Date;
+    end: Date;
+    durationMs: number;
+  }
 
 class Task {
     _textEditor: vscode.TextEditor;
@@ -13,8 +19,10 @@ class Task {
         return this._range;
     }
 
-    get getInfo():string {
-        return this._title;
+    get getInfo(): vscode.MarkdownString {
+        var info = new vscode.MarkdownString(`**` + this._title + `**\n\n`);
+        info.appendText("Duration: " + this.totalDuration + "h");
+        return info;
     }
 
     get isActive():boolean {
@@ -32,6 +40,61 @@ class Task {
     get countToggles(): number{
         return this._toggles.length; 
     }
+    get getTable():timeEntry[]{
+        var table:timeEntry[] = [];
+        const toggleCount = this.countToggles;
+        if (toggleCount> 1)
+        {
+            for (var toggleIndex = 0; toggleIndex < toggleCount; toggleIndex++)
+            {
+                var startDate;
+                var endDate;
+                var dur: number = 0;
+                var pushEntry: boolean = false;
+                if(toggleIndex == 0 && toggleCount == 1){
+                    //just one toggle is there and thats it
+                    startDate = this._toggles[toggleIndex];
+                    endDate = null;
+                    dur =  new Date().getTime() - new Date(startDate).getTime();
+                    pushEntry = true;   
+                }
+                else if (toggleIndex % 2 == 1){
+                    //use every second toggle
+                    startDate = this._toggles[toggleIndex-1];
+                    endDate = this._toggles[toggleIndex];
+                    dur =  new Date(endDate).getTime() - new Date(startDate).getTime();   
+                    pushEntry = true;    
+                }
+                else if (toggleIndex == toggleCount-1){
+                    // thats the last one. task is active
+                    startDate = this._toggles[toggleIndex];
+                    endDate = null;
+                    dur =  new Date().getTime() - new Date(startDate).getTime();
+                    pushEntry = true;   
+                }
+                if (pushEntry){
+                    const newEntry:timeEntry = {
+                        start: startDate,
+                        end: endDate,
+                        durationMs: dur 
+                    };
+                    table.push(newEntry);
+                }   
+            }
+        }
+
+        return table;
+    }
+    get totalDuration(): number{
+        var duration = 0;
+        const entries = this.getTable;
+        entries.forEach(element => {
+            duration = duration + element.durationMs / 1000 / 60 / 60;    
+        });
+
+        return duration;
+    }
+
     public getTimeStamp(index: number){
         return this._toggles[index];
     }
