@@ -25,8 +25,15 @@ class Task {
         return this._range.start.line;
     }
 
-    get getTitle():Number{
+    get getTitle():string{
         return this._title;
+    }
+
+    get countToggles(): number{
+        return this._toggles.length; 
+    }
+    public getTimeStamp(index: number){
+        return this._toggles[index];
     }
 
     public atLine(lineToCheck: Number): boolean{

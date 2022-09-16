@@ -3,15 +3,16 @@
 import { start } from 'repl';
 import * as vscode from 'vscode';
 import Task from './task';
+import TimerStatusBarItem from "./timerStatusBarItem"
 
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "markdown-todo-timer" is now active!');
+	const statusBarItem = new TimerStatusBarItem();
 
 	function getActiveTasks(tasks:Task[]): Task[]{
 		let activeTasks:Task[] = [];
@@ -21,6 +22,20 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		});
 		return activeTasks;
+	}
+
+	function handleTimer(){
+
+		const tasks:Task[] = getTasks();
+		const activeTasks = getActiveTasks(tasks);
+		if (activeTasks.length > 0)
+		{
+			statusBarItem.setTask(activeTasks[0]);
+		}
+		else
+		{
+			statusBarItem.removeTask;
+		}
 	}
 
 	// This function shall toggle a timer for a given task.
@@ -35,7 +50,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const tasks:Task[] = getTasks();
-		const rangesToToggle:vscode.Range[] = [];
 		const activeTasks = getActiveTasks(tasks);
 		const currentLine = activeEditor.selection.active.line;
 		if (activeTasks.length == 0){
@@ -46,6 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
 				{
 					element.insertTimeStamp();
 					console.log("Started timer for: " + element.getTitle)
+					statusBarItem.setTask(element);
 				}
 			});
 		}
@@ -54,12 +69,19 @@ export function activate(context: vscode.ExtensionContext) {
 			//one active task is there
 			activeTasks[0].insertTimeStamp();
 			console.log("Stopped timer for: " + activeTasks[0].getTitle)
-
+			if (activeTasks.length == 1)
+			{
+				statusBarItem.removeTask();
+			}
+			else
+			{
+				statusBarItem.setTask(activeTasks[1]);
+			}
 		}
 	});
 
+	context.subscriptions.push(statusBarItem);
 	context.subscriptions.push(disposable);
-
 
 
 	let timeout: NodeJS.Timer | undefined = undefined;
@@ -152,11 +174,9 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.workspace.onDidChangeTextDocument(event => {
 		if (activeEditor && event.document === activeEditor.document) {
 			triggerUpdateDecorations(true);
-			console.log(event.contentChanges[0].text);
-			console.log(event.contentChanges[1].text);
-
 		}
 	}, null, context.subscriptions);
+	handleTimer();
 
 }
 
