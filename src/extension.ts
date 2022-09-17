@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { start } from 'repl';
 import * as vscode from 'vscode';
+import TaskCollection from './taskcollection'
 import Task from './task';
 import TimerStatusBarItem from "./timerStatusBarItem"
 
@@ -14,20 +14,15 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "markdown-todo-timer" is now active!');
 	const statusBarItem = new TimerStatusBarItem();
 
-	function getActiveTasks(tasks:Task[]): Task[]{
-		let activeTasks:Task[] = [];
-		tasks.forEach(element => {
-			if (element.isActive){
-				activeTasks.push(element);
-			}
-		});
-		return activeTasks;
-	}
-
 	function handleTimer(){
+		const activeEditor = vscode.window.activeTextEditor;
+		if (!activeEditor) {
+			return
+		}
 
-		const tasks:Task[] = getTasks();
-		const activeTasks = getActiveTasks(tasks);
+		const tasks:TaskCollection = new TaskCollection(activeEditor);
+		const activeTasks = tasks.getActiveTasks();
+
 		if (activeTasks.length > 0)
 		{
 			statusBarItem.setTask(activeTasks[0]);
@@ -49,8 +44,9 @@ export function activate(context: vscode.ExtensionContext) {
 			return
 		}
 
-		const tasks:Task[] = getTasks();
-		const activeTasks = getActiveTasks(tasks);
+		const tasks:TaskCollection = new TaskCollection(activeEditor);
+		const activeTasks = tasks.getActiveTasks();
+		
 		const currentLine = activeEditor.selection.active.line;
 		if (activeTasks.length == 0){
 		
@@ -98,34 +94,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	let activeEditor = vscode.window.activeTextEditor;
 
-	function getTasks() : Task[]{
-		var tasks:Task[] = [];
-		if (!activeEditor) {
-			return tasks;
-		}
-		const regEx = /- \[x\]|- \[ \]/g;
-		const text = activeEditor.document.getText();
-
-		let match;
-		const taskDeco: vscode.DecorationOptions[] = [];
-
-		while ((match = regEx.exec(text))) {
- 
-			const startPos = activeEditor.document.positionAt(match.index);
-			const endPos = activeEditor.document.lineAt(startPos).range.end;
-
-			tasks.push(new Task(activeEditor,new vscode.Range(startPos, endPos)));
-		}
-		return tasks;		
-	}
-
 	function updateDecorations() {
 		if (!activeEditor) {
 			return;
 		}
 
 		const taskDeco: vscode.DecorationOptions[] = [];
-		var tasks:Task[] = getTasks();
+		const tasks:TaskCollection = new TaskCollection(activeEditor);
 
 		tasks.forEach(element => {
 			if (element.isActive){
