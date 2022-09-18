@@ -19,13 +19,22 @@
       {
         "command": "markdown-todo-timer.toggleTimer",
         "title": "Toggle timer"
+      },
+      {
+        "command": "markdown-todo-timer.toggleStatus",
+        "title": "Toggle status"
       }
     ],
     "keybindings": [
       {
-          "command": "-markdown-todo-timer.toggleTimer",
-          "key": "ctrl+alt+t",
+          "command": "markdown-todo-timer.toggleTimer",
+          "key": "ctrl+shift+c",
           "when": "editorTextFocus && editorLangId == 'markdown'"
+      },
+      {
+        "command": "markdown-todo-timer.toggleStatus",
+        "key": "ctrl+shift+enter",
+        "when": "editorTextFocus && editorLangId == 'markdown'"
       }
   ]
   },

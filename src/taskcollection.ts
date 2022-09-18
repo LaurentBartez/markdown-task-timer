@@ -34,7 +34,6 @@ class TaskCollection extends Array<Task> {
 			this.push(new Task(this._textEditor,new vscode.Range(startPos, endPos)));
 		}		
 	}
-
     constructor(textEditor: vscode.TextEditor,...items: Task[]) {
         super(...items);
         this._textEditor = textEditor || null;

@@ -76,8 +76,23 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	context.subscriptions.push(statusBarItem);
 	context.subscriptions.push(disposable);
+	disposable = vscode.commands.registerCommand('markdown-todo-timer.toggleStatus', () => {
+		
+		//check if selected line is a task
+		const activeEditor = vscode.window.activeTextEditor;
+		if (!activeEditor) {
+			return
+		}
+
+		const task = new Task(activeEditor,activeEditor.document.lineAt(activeEditor.selection.active.line).range);
+		task.toggleStatus();
+
+	});
+	context.subscriptions.push(disposable);
+
+
+	context.subscriptions.push(statusBarItem);
 
 
 	let timeout: NodeJS.Timer | undefined = undefined;

@@ -7,6 +7,9 @@ interface timeEntry {
     end: Date;
     durationMs: number;
   }
+const TASK_DONE: string = "x";
+const TASK_INWORK: string = " ";
+const TASK_IDENT: string = "- [";
 
 class Task {
     _textEditor: vscode.TextEditor;
@@ -29,7 +32,7 @@ class Task {
         return this._toggles.length % 2 == 1 ? true : false;
     }
 
-    get getLine():Number{
+    get getLine():number{
         return this._range.start.line;
     }
 
@@ -94,12 +97,15 @@ class Task {
 
         return duration;
     }
-
+    get isDone(): boolean{
+        const formattedLine = this._line.trimStart();
+        return formattedLine.indexOf(this.taskPrefix(TASK_DONE)) == 0;
+    }
     public getTimeStamp(index: number){
         return this._toggles[index];
     }
 
-    public atLine(lineToCheck: Number): boolean{
+    public atLine(lineToCheck: number): boolean{
         return (this.getLine == lineToCheck);
     }
     public insertTimeStamp(){
@@ -111,9 +117,29 @@ class Task {
 			activeEditor.edit(editBuilder => {
 				editBuilder.insert(this.getRange.end, " [" + formattedDate + "]");
 			});
-
 		}
 	}
+    public toggleStatus(){
+        const activeEditor = vscode.window.activeTextEditor;
+		if (activeEditor) {
+            const start = new vscode.Position(this.getLine,this._line.indexOf("-") + 3);
+            const end = new vscode.Position(this.getLine,this._line.indexOf("-") + 4);
+            const rgToReplace = new vscode.Range(start,end);
+            activeEditor.edit(editBuilder =>{
+                if (this.isDone){
+                    
+                    editBuilder.replace(rgToReplace,TASK_INWORK);
+                }
+                else
+                {
+                    editBuilder.replace(rgToReplace,TASK_DONE);
+                }
+            })
+        };
+    }
+    private taskPrefix(status:string):string{
+        return (TASK_IDENT + status +"]");
+    }
     static timeStamps(line: string):Date[] {
         var tagToCheck = "[";
         var startTags = line.indexOf(tagToCheck);
@@ -138,7 +164,7 @@ class Task {
 
     private makeTitle(line: string): string{
         var formattedTitle:string = line.trimStart();
-        formattedTitle = formattedTitle.substring("- [ ] ".length);
+        formattedTitle = formattedTitle.substring((TASK_IDENT+" ] ").length);
         const idxFirstTag = formattedTitle.indexOf("[");
         if (idxFirstTag > 0){
             formattedTitle = formattedTitle.substring(0,idxFirstTag);
