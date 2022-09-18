@@ -15,7 +15,8 @@ The intention is to have a similar functionality for todo-lists based on markdow
 
 This extension contributes the following commands:
 
-* `markdown-todo-timer.toggleTimer (Ctrl+Alt+t)`: Toggles the timer. Active tasks will be set inactive. If there is no active tasks, the selected task will be toggled to active 
+* `markdown-todo-timer.toggleTimer (ctrl+shift+c)`: Toggles the timer. Active tasks will be set inactive. If there is no active tasks, the selected task will be toggled to active 
+* `markdown-todo-timer.toggleStatus (ctrl+shift+enter)`: Toggles the task status between done and inwork 
 
 ## Known Issues
 
