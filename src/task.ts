@@ -1,12 +1,8 @@
 import * as vscode from 'vscode';
 import * as moment from 'moment';
-import { table } from 'console';
+import DataFrame from 'dataframe-js';
+import TimeEntry from './timeEntry';
 
-interface timeEntry {
-    start: Date;
-    end: Date;
-    durationMs: number;
-  }
 const TASK_DONE: string = "x";
 const TASK_INWORK: string = " ";
 const TASK_IDENT: string = "- [";
@@ -23,8 +19,24 @@ class Task {
     }
 
     get getInfo(): vscode.MarkdownString {
-        var info = new vscode.MarkdownString(`**` + this._title + `**\n\n`);
-        info.appendText("Duration: " + this.totalDuration + "h");
+        var info = new vscode.MarkdownString(`**` + this._title + `**  `);
+        var statusString:string = "";
+        if (this.isDone){
+            statusString = `<span style="color:#008000;">Done</span>`;
+        }
+        info.appendMarkdown(statusString);
+        info.appendMarkdown("\n\n---\n\n");
+
+        info.appendMarkdown("\n\nDuration: " + +this.totalDuration.toFixed(2) + "h\n\n");
+        var table = this.infoTable;
+        if (table.length > 0)
+        {
+            info.appendMarkdown("### Timestamps\n\n");
+            info.appendMarkdown(table);
+        }
+        
+        info.supportHtml = true;
+        info.isTrusted = true;
         return info;
     }
 
@@ -43,8 +55,8 @@ class Task {
     get countToggles(): number{
         return this._toggles.length; 
     }
-    get getTable():timeEntry[]{
-        var table:timeEntry[] = [];
+    get getTable():TimeEntry[]{
+        var table:TimeEntry[] = [];
         const toggleCount = this.countToggles;
         if (toggleCount> 1)
         {
@@ -58,29 +70,22 @@ class Task {
                     //just one toggle is there and thats it
                     startDate = this._toggles[toggleIndex];
                     endDate = null;
-                    dur =  new Date().getTime() - new Date(startDate).getTime();
                     pushEntry = true;   
                 }
                 else if (toggleIndex % 2 == 1){
                     //use every second toggle
                     startDate = this._toggles[toggleIndex-1];
                     endDate = this._toggles[toggleIndex];
-                    dur =  new Date(endDate).getTime() - new Date(startDate).getTime();   
                     pushEntry = true;    
                 }
                 else if (toggleIndex == toggleCount-1){
                     // thats the last one. task is active
                     startDate = this._toggles[toggleIndex];
                     endDate = null;
-                    dur =  new Date().getTime() - new Date(startDate).getTime();
                     pushEntry = true;   
                 }
                 if (pushEntry){
-                    const newEntry:timeEntry = {
-                        start: startDate,
-                        end: endDate,
-                        durationMs: dur 
-                    };
+                    const newEntry:TimeEntry = new TimeEntry(startDate,endDate);
                     table.push(newEntry);
                 }   
             }
@@ -88,18 +93,34 @@ class Task {
 
         return table;
     }
+
     get totalDuration(): number{
         var duration = 0;
         const entries = this.getTable;
+
         entries.forEach(element => {
-            duration = duration + element.durationMs / 1000 / 60 / 60;    
+            duration = duration + element._durationMs / 1000 / 60 / 60;    
         });
 
         return duration;
     }
+    get infoTable():string{
+        var table = this.getTable;
+        var formatted:any[] = [];
+        table.forEach(element=>{
+            formatted.push(element.formatted("YYYY-MM-DD HH:mm"));
+        });
+        const tableify = require('html-tableify');
+        var tableHTML = tableify(formatted);
+        return tableHTML.replaceAll("text-align: center","text-align: center;border: 1px solid black;border-collapse: collapse;");
+    }
     get isDone(): boolean{
         const formattedLine = this._line.trimStart();
         return formattedLine.indexOf(this.taskPrefix(TASK_DONE)) == 0;
+    }
+
+    get isStarted(): boolean{
+        return this._toggles.length > 0;
     }
     public getTimeStamp(index: number){
         return this._toggles[index];
@@ -140,6 +161,7 @@ class Task {
     private taskPrefix(status:string):string{
         return (TASK_IDENT + status +"]");
     }
+
     static timeStamps(line: string):Date[] {
         var tagToCheck = "[";
         var startTags = line.indexOf(tagToCheck);

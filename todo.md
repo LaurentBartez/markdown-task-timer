@@ -3,11 +3,11 @@
 ## Fun ideas 
 
 - [x] make class for Task-Collection to improve encapsulation
-- [ ] create shortcuts to toggle state between done and todo
+- [x] create shortcuts to toggle state between done and todo
+- [x] add timetable task to hover when on title
+- [ ] create .md report with daily steps
 - [ ] indicate duration on attachment in case of timestamps
 - [ ] hide status timer when not active
-- [ ] add timetable task to hover when on title
-- [ ] create .md report with daily steps
 
 ## Not so fun work
 
