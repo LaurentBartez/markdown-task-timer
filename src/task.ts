@@ -27,13 +27,7 @@ class Task {
         info.appendMarkdown(statusString);
         info.appendMarkdown("\n\n---\n\n");
 
-        info.appendMarkdown("\n\nDuration: " + +this.totalDuration.toFixed(2) + "h\n\n");
-        var table = this.infoTable;
-        if (table.length > 0)
-        {
-            info.appendMarkdown("### Timestamps\n\n");
-            info.appendMarkdown(table);
-        }
+        info.appendMarkdown("\n\nDuration: " + +this.totalDuration.toFixed(2) + "h");
         
         info.supportHtml = true;
         info.isTrusted = true;
@@ -140,6 +134,58 @@ class Task {
 			});
 		}
 	}
+
+    ///function to get infotext for a given timestamp
+    public timeStampInfo(timeStamp: string){
+        const dateToCheck = new Date(timeStamp);
+
+        var indexSelected = this._toggles.length; 
+        var foundToggle: boolean = false;
+        for (var iDate = 0; iDate < this._toggles.length; iDate++){
+			const formattedDate = (moment(this._toggles[iDate])).format('YYYY-MM-DD HH:mm');
+
+            if (formattedDate === timeStamp)
+            {
+                indexSelected = iDate;
+                foundToggle = true;
+                break;
+            }
+        }
+        
+        var entry;
+        const text = new vscode.MarkdownString('');
+        if (foundToggle)
+        {
+            if (indexSelected % 2 === 0
+                || indexSelected === 0)
+            {
+                /// timestamp started a task
+                text.appendMarkdown('**' + timeStamp +'** - ');
+                if (!this.isActive)
+                {
+                    const indexAdjacent = indexSelected + 1; 
+                    text.appendMarkdown((moment(this._toggles[indexAdjacent])).format('YYYY-MM-DD HH:mm'));    
+                    entry = new TimeEntry(new Date(timeStamp),this._toggles[indexAdjacent]);
+                }
+                else{
+                    entry = new TimeEntry(new Date(timeStamp),new Date());
+
+                }
+            }
+            else
+            {
+                ///timestamp stopped a task
+                const indexAdjacent = indexSelected - 1; 
+                text.appendMarkdown((moment(this._toggles[indexAdjacent])).format('YYYY-MM-DD HH:mm')  + ' - **' + timeStamp +'** ');
+                entry = new TimeEntry(this._toggles[indexAdjacent],new Date(timeStamp));
+            }
+            text.appendMarkdown("\n\n---\n\n");
+            text.appendMarkdown("\n\nDuration: " + +(entry._durationMs/1000/60/60).toFixed(2) + "h");
+        }
+        
+        return text; 
+    }
+
     public toggleStatus(){
         const activeEditor = vscode.window.activeTextEditor;
 		if (activeEditor) {

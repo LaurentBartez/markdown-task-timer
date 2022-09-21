@@ -184,12 +184,22 @@ export function activate(context: vscode.ExtensionContext) {
 			let match;
 			while ((match = regEx.exec(document.lineAt(position).text))) {
 				
+				const regExTimeStamp = /\[(.*?)\]/g;
 				const range = document.lineAt(position).range;
-				const startPos = activeEditor.document.positionAt(match.index);
-				const endPos = activeEditor.document.lineAt(startPos).range.end;
-	
+				
 				var task = new Task(activeEditor,range);
-				return new vscode.Hover(task.getInfo,range);
+				const wordRange = document.getWordRangeAtPosition(position, regExTimeStamp);
+				const timeInfo = task.timeStampInfo(document.getText(wordRange).slice(1,-1));
+				console.log(timeInfo);
+				if (timeInfo.value.length > 0)
+				{
+					return new vscode.Hover(timeInfo,wordRange);
+
+				}
+				else
+				{
+					return new vscode.Hover(task.getInfo,range);
+				}
 			}
 
 
