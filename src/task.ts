@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 import * as moment from 'moment';
-import DataFrame from 'dataframe-js';
 import TimeEntry from './timeEntry';
 
 const TASK_DONE: string = "x";
 const TASK_INWORK: string = " ";
 const TASK_IDENT: string = "- [";
+const TIMESTAMP_FORMAT: string = "YYYY-MM-DD HH:mm";
 
 class Task {
     _textEditor: vscode.TextEditor;
@@ -102,7 +102,7 @@ class Task {
         var table = this.getTable;
         var formatted:any[] = [];
         table.forEach(element=>{
-            formatted.push(element.formatted("YYYY-MM-DD HH:mm"));
+            formatted.push(element.formatted(TIMESTAMP_FORMAT));
         });
         const tableify = require('html-tableify');
         var tableHTML = tableify(formatted);
@@ -212,7 +212,7 @@ class Task {
         var tagToCheck = "[";
         var startTags = line.indexOf(tagToCheck);
         var content:Date[] = [];
-        const dateScheme = "YYYY-MM-DD HH:mm";
+        const dateScheme = TIMESTAMP_FORMAT;
         if (startTags > -1) {
             line = line.substring(startTags);
             var endTask = line.indexOf("]");

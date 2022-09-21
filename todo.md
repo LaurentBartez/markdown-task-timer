@@ -6,7 +6,7 @@
 - [x] create shortcuts to toggle state between done and todo
 - [x] add timetable task to hover when on title
 - [x] create .md report with daily steps
-- [ ] indicate duration on attachment in case of timestamps
+- [x] indicate duration on attachment in case of timestamps
 - [ ] hide status timer when not active
 
 ## Not so fun work
