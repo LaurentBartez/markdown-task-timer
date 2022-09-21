@@ -1,9 +1,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import TaskCollection from './taskcollection'
+import TaskCollection from './taskcollection';
 import Task from './task';
-import TimerStatusBarItem from "./timerStatusBarItem"
+import TimerStatusBarItem from "./timerStatusBarItem";
 
 
 // this method is called when your extension is activated
@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 	function handleTimer(){
 		const activeEditor = vscode.window.activeTextEditor;
 		if (!activeEditor) {
-			return
+			return;
 		}
 
 		const tasks:TaskCollection = new TaskCollection(activeEditor);
@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
 		//check if selected line is a task
 		const activeEditor = vscode.window.activeTextEditor;
 		if (!activeEditor) {
-			return
+			return;
 		}
 
 		const tasks:TaskCollection = new TaskCollection(activeEditor);
@@ -55,7 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 				if (element.atLine(currentLine))
 				{
 					element.insertTimeStamp();
-					console.log("Started timer for: " + element.getTitle)
+					console.log("Started timer for: " + element.getTitle);
 					statusBarItem.setTask(element);
 				}
 			});
@@ -64,7 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
 		{
 			//one active task is there
 			activeTasks[0].insertTimeStamp();
-			console.log("Stopped timer for: " + activeTasks[0].getTitle)
+			console.log("Stopped timer for: " + activeTasks[0].getTitle);
 			if (activeTasks.length == 1)
 			{
 				statusBarItem.removeTask();
@@ -82,13 +82,30 @@ export function activate(context: vscode.ExtensionContext) {
 		//check if selected line is a task
 		const activeEditor = vscode.window.activeTextEditor;
 		if (!activeEditor) {
-			return
+			return;
 		}
 
 		const task = new Task(activeEditor,activeEditor.document.lineAt(activeEditor.selection.active.line).range);
 		task.toggleStatus();
 
 	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('markdown-todo-timer.makeReport', () => {
+		
+		//check if selected line is a task
+		const activeEditor = vscode.window.activeTextEditor;
+		if (!activeEditor) {
+			return;
+		}
+		var tasks = new TaskCollection(activeEditor);
+		const timeTable: string = tasks.getTimeTables; 
+		vscode.workspace.openTextDocument({
+			content: timeTable,
+			language: "markdown"
+		}).then(newDocument => {
+			vscode.window.showTextDocument(newDocument);
+		});	});
 	context.subscriptions.push(disposable);
 
 
@@ -172,7 +189,7 @@ export function activate(context: vscode.ExtensionContext) {
 				const endPos = activeEditor.document.lineAt(startPos).range.end;
 	
 				var task = new Task(activeEditor,range);
-				return new vscode.Hover(task.getInfo,range)
+				return new vscode.Hover(task.getInfo,range);
 			}
 
 

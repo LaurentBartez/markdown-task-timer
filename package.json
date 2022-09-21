@@ -23,6 +23,10 @@
       {
         "command": "markdown-todo-timer.toggleStatus",
         "title": "Toggle status"
+      },
+      {
+        "command": "markdown-todo-timer.makeReport",
+        "title": "Make report"
       }
     ],
     "keybindings": [
@@ -62,8 +66,9 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "dataframe-js": "^1.4.4",
+    "data-forge": "^1.9.6",
     "html-tableify": "^0.0.2",
+    "markdown-table-ts": "^1.0.3",
     "moment": "^2.29.4"
   }
 }

@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
-import Task from "./task"
+import Task from "./task";
+import * as moment from 'moment';
+import { Align, getMarkdownTable } from 'markdown-table-ts';
+
+
 
 class TaskCollection extends Array<Task> {
     _textEditor: vscode.TextEditor;
@@ -14,7 +18,98 @@ class TaskCollection extends Array<Task> {
 		return activeTasks;
 	}
 
+	get getTimeTables(){
+		const dataForge = require('data-forge');
+		function getMd(df: any){
+			df = df.toStrings("duration");
+			const header = df.getColumnNames();
+			const rows = df.toRows();
+			const tableData = {
+				table: {
+					head: header,
+					body: rows
+				}
+			};
 
+			return getMarkdownTable(tableData);
+		};
+		var df = new dataForge.DataFrame({columns:this.getEntries});
+		df = df.orderBy((row: { start: any; }) => row.start);
+	
+		var startDays = df.getSeries('startDay');
+		const uniqueDays = startDays.distinct();
+
+		// make dailies
+		var timeTable:string = "";
+		var durationTable:string = "";
+
+		uniqueDays.forEach((day: any) => {
+			var filtered = df.where((row:any) => row.startDay === day);
+			
+			timeTable += "### " + day.toString() + "\n\n";
+			timeTable += getMd(filtered.subset(['title','start','end','duration']));
+			timeTable += "\n\n";
+
+			durationTable += "### " + day.toString() + "\n\n";
+			const pivotted = filtered.pivot("title", "duration", (series: { sum: () => any; }) => series.sum());
+			durationTable += getMd(pivotted.subset(['title','duration']));
+			durationTable += "\n\n";
+
+		});
+
+		// make total
+		var totalDuration:string = "";
+		const pivottedTotal = df.pivot("title", "duration", (series: { sum: () => any; }) => series.sum());
+		totalDuration += getMd(pivottedTotal.subset(['title','duration']));
+		totalDuration += "\n\n";
+
+		var table: string = "# Report";
+		table += "\n\n";
+		table += "## Daily log";
+		table += "\n\n";
+		table += timeTable;
+		table += "\n";
+		table += "## Daily duration";
+		table += "\n\n";
+		table += durationTable;
+		table += "\n";
+		table += "## Total duration";
+		table += "\n\n";
+		table += totalDuration;
+
+
+		return table;
+	}
+
+	get getEntries(){
+		var titles:string[] =[];
+		var starts: string[] =[];
+		var ends: string[] =[];
+		var durations:number[]  =[];
+		var startDays:string[]  =[];
+
+		this.forEach(task=>{
+			var timeEntries = task.getTable;
+			timeEntries.forEach(element=>{
+				
+					titles.push(task.getTitle);
+					starts.push(moment(element._start.getTime()).format('HH:mm'));
+					ends.push(moment(element._end.getTime()).format('HH:mm'));
+					durations.push(element._durationMs / 1000 / 60 / 60);
+					startDays.push(moment(element._start.getTime()).format('YYYY-MM-DD'));
+				
+			});
+		});
+		var data ={
+			title: titles,
+			start: starts,
+			end: ends,
+			duration: durations,
+			startDay: startDays
+		
+		};
+		return data;
+	}
     private getTasks(){
 		var tasks:Task[] = [];
 		if (!this._textEditor) {

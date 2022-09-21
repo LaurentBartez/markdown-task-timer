@@ -155,7 +155,7 @@ class Task {
                 {
                     editBuilder.replace(rgToReplace,TASK_DONE);
                 }
-            })
+            });
         };
     }
     private taskPrefix(status:string):string{
