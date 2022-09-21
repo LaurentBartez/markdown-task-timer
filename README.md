@@ -10,6 +10,7 @@ The intention is to have a similar functionality for todo-lists based on markdow
 - add timestamps to todo-tasks. The timestamp format is [YYYY-MM-DD hh:mm].
 - indicate active tasks in editor
 - show timer in status bar whenever there is an active task
+- make a comprehensive report
 
 ## Extension Settings
 
@@ -17,6 +18,8 @@ This extension contributes the following commands:
 
 * `markdown-todo-timer.toggleTimer (ctrl+shift+c)`: Toggles the timer. Active tasks will be set inactive. If there is no active tasks, the selected task will be toggled to active 
 * `markdown-todo-timer.toggleStatus (ctrl+shift+enter)`: Toggles the task status between done and inwork 
+* `markdown-todo-timer.makeReport`: Creates a report that summarizes your timestamps in a new editor. Of course formatted as markdown 
+
 
 ## Known Issues
 
