@@ -1,10 +1,7 @@
-# markdown-todo-timer README
+# Markdown Todo Timer 
 
-Inspired from the emacs org-mode clocking feature I created this vs-code extension.  
+Add timers to your markdown todo-list and get a report summarizing your efforts. 
 
-The intention is to have a similar functionality for todo-lists based on markdown syntax. 
-
-**Currently this project is not released to the marketplace as I just started the development.**
 ## Features
 
 - add timestamps to todo-tasks. The timestamp format is [YYYY-MM-DD hh:mm].
