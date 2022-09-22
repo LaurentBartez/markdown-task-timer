@@ -1,6 +1,7 @@
 {
   "name": "markdown-todo-timer",
   "displayName": "Markdown Todo Timer",
+  "publisher": "ThomasKnorr",
   "description": "Start logging work-effort on your markdown todo list.",
   "version": "0.0.1",
   "engines": {
@@ -10,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/LaurentBartez/markdown-todo-timer.git"
-},
+  },
   "categories": [
     "Other"
   ],
@@ -29,7 +30,6 @@
         "command": "markdown-todo-timer.promoteTask",
         "title": "Promote task",
         "category": "Markdown Todo Timer"
-
       },
       {
         "command": "markdown-todo-timer.demoteTask",
@@ -78,6 +78,7 @@
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "@vscode/test-electron": "^2.1.5",
+    "esbuild": "^0.15.8",
     "eslint": "^8.20.0",
     "glob": "^8.0.3",
     "mocha": "^10.0.0",

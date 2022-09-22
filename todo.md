@@ -2,7 +2,7 @@
 
 ## Fun ideas 
 
-- [x] make class for Task-Collection to improve encapsulation
+- [x] make class for Task-Collection to improve encapsulation [2022-09-22 20:37] [2022-09-22 20:38]
 - [x] create shortcuts to toggle state between done and todo
 - [x] add timetable task to hover when on title
 - [x] create .md report with daily steps
