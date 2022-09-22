@@ -4,7 +4,7 @@ Add timers to your markdown todo-list and get a report summarizing your efforts.
 
 ## Features
 
-- add timestamps to todo-tasks. The timestamp format is [YYYY-MM-DD hh:mm].
+- add timestamps to todo-tasks. The timestamp format is `[YYYY-MM-DD hh:mm]`.
 - indicate active tasks in editor
 - show timer in status bar whenever there is an active task
 - make a comprehensive report

@@ -1,16 +1,20 @@
 {
   "name": "markdown-todo-timer",
-  "displayName": "Markdown todo timer",
-  "description": "time your markdown tasks",
+  "displayName": "Markdown Todo Timer",
+  "description": "Start logging work-effort on your markdown todo list.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.71.0"
   },
+  "license": "SEE LICENSE IN License.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LaurentBartez/markdown-todo-timer.git"
+},
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onCommand:markdown-todo-timer.toggleTimer",
     "onLanguage:markdown"
   ],
   "main": "./out/extension.js",
@@ -18,19 +22,24 @@
     "commands": [
       {
         "command": "markdown-todo-timer.toggleTimer",
-        "title": "Toggle timer"
+        "title": "Toggle timer",
+        "category": "Markdown Todo Timer"
       },
       {
-        "command": "markdown-todo-timer.promote",
-        "title": "Promote task"
+        "command": "markdown-todo-timer.promoteTask",
+        "title": "Promote task",
+        "category": "Markdown Todo Timer"
+
       },
       {
-        "command": "markdown-todo-timer.demote",
-        "title": "Demote task"
+        "command": "markdown-todo-timer.demoteTask",
+        "title": "Demote task",
+        "category": "Markdown Todo Timer"
       },
       {
         "command": "markdown-todo-timer.makeReport",
-        "title": "Make report"
+        "title": "Make report",
+        "category": "Markdown Todo Timer"
       }
     ],
     "keybindings": [
