@@ -7,7 +7,8 @@
 - [x] add timetable task to hover when on title
 - [x] create .md report with daily steps
 - [x] indicate duration on attachment in case of timestamps
-- [ ] hide status timer when not active
+- [x] hide status timer when not active
+- [ ] cycle todo status
 
 ## Not so fun work
 
