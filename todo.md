@@ -8,7 +8,7 @@
 - [x] create .md report with daily steps
 - [x] indicate duration on attachment in case of timestamps
 - [x] hide status timer when not active
-- [ ] cycle todo status
+- [x] cycle todo status
 
 ## Not so fun work
 

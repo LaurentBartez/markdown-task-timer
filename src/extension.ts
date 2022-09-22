@@ -48,8 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const activeTasks = tasks.getActiveTasks();
 		
 		const currentLine = activeEditor.selection.active.line;
-		if (activeTasks.length == 0){
-		
+		if (activeTasks.length === 0){
 			//no task is active start task in current line, if any
 			tasks.forEach(element => {
 				if (element.atLine(currentLine))
@@ -65,7 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
 			//one active task is there
 			activeTasks[0].insertTimeStamp();
 			console.log("Stopped timer for: " + activeTasks[0].getTitle);
-			if (activeTasks.length == 1)
+			if (activeTasks.length === 1)
 			{
 				statusBarItem.removeTask();
 			}
@@ -77,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
-	disposable = vscode.commands.registerCommand('markdown-todo-timer.toggleStatus', () => {
+	disposable = vscode.commands.registerCommand('markdown-todo-timer.promoteTask', () => {
 		
 		//check if selected line is a task
 		const activeEditor = vscode.window.activeTextEditor;
@@ -86,10 +85,25 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const task = new Task(activeEditor,activeEditor.document.lineAt(activeEditor.selection.active.line).range);
-		task.toggleStatus();
+		task.promote();
 
 	});
 	context.subscriptions.push(disposable);
+	
+	disposable = vscode.commands.registerCommand('markdown-todo-timer.demoteTask', () => {
+		
+		//check if selected line is a task
+		const activeEditor = vscode.window.activeTextEditor;
+		if (!activeEditor) {
+			return;
+		}
+
+		const task = new Task(activeEditor,activeEditor.document.lineAt(activeEditor.selection.active.line).range);
+		task.demote();
+
+	});
+	context.subscriptions.push(disposable);
+
 
 	disposable = vscode.commands.registerCommand('markdown-todo-timer.makeReport', () => {
 		

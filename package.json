@@ -21,8 +21,12 @@
         "title": "Toggle timer"
       },
       {
-        "command": "markdown-todo-timer.toggleStatus",
-        "title": "Toggle status"
+        "command": "markdown-todo-timer.promote",
+        "title": "Promote task"
+      },
+      {
+        "command": "markdown-todo-timer.demote",
+        "title": "Demote task"
       },
       {
         "command": "markdown-todo-timer.makeReport",
@@ -32,12 +36,17 @@
     "keybindings": [
       {
         "command": "markdown-todo-timer.toggleTimer",
-        "key": "ctrl+shift+c",
+        "key": "ctrl+alt+[Minus]",
         "when": "editorTextFocus && editorLangId == 'markdown'"
       },
       {
-        "command": "markdown-todo-timer.toggleStatus",
-        "key": "ctrl+shift+enter",
+        "command": "markdown-todo-timer.promoteTask",
+        "key": "ctrl+alt+[Period]",
+        "when": "editorTextFocus && editorLangId == 'markdown'"
+      },
+      {
+        "command": "markdown-todo-timer.demoteTask",
+        "key": "ctrl+alt+[Comma]",
         "when": "editorTextFocus && editorLangId == 'markdown'"
       }
     ]

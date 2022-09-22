@@ -4,7 +4,8 @@ import TimeEntry from './timeEntry';
 
 const TASK_DONE: string = "x";
 const TASK_INWORK: string = " ";
-const TASK_IDENT: string = "- [";
+const BULLET_IDENT: string ="- ";
+const TASK_IDENT: string = BULLET_IDENT + "[";
 const TIMESTAMP_FORMAT: string = "YYYY-MM-DD HH:mm";
 
 class Task {
@@ -13,7 +14,8 @@ class Task {
     _toggles: any;
     _line: any;
     _range: vscode.Range;
-    
+    _state: number; //0: text; 1: bullet; 2: in work; 3: done
+
     get getRange():vscode.Range {
         return this._range;
     }
@@ -35,7 +37,7 @@ class Task {
     }
 
     get isActive():boolean {
-        return this._toggles.length % 2 == 1 ? true : false;
+        return this._toggles.length % 2 === 1 ? true : false;
     }
 
     get getLine():number{
@@ -60,19 +62,19 @@ class Task {
                 var endDate;
                 var dur: number = 0;
                 var pushEntry: boolean = false;
-                if(toggleIndex == 0 && toggleCount == 1){
+                if(toggleIndex === 0 && toggleCount === 1){
                     //just one toggle is there and thats it
                     startDate = this._toggles[toggleIndex];
                     endDate = null;
                     pushEntry = true;   
                 }
-                else if (toggleIndex % 2 == 1){
+                else if (toggleIndex % 2 === 1){
                     //use every second toggle
                     startDate = this._toggles[toggleIndex-1];
                     endDate = this._toggles[toggleIndex];
                     pushEntry = true;    
                 }
-                else if (toggleIndex == toggleCount-1){
+                else if (toggleIndex === toggleCount-1){
                     // thats the last one. task is active
                     startDate = this._toggles[toggleIndex];
                     endDate = null;
@@ -110,7 +112,7 @@ class Task {
     }
     get isDone(): boolean{
         const formattedLine = this._line.trimStart();
-        return formattedLine.indexOf(this.taskPrefix(TASK_DONE)) == 0;
+        return formattedLine.indexOf(this.taskPrefix(3)) === 0;
     }
 
     get isStarted(): boolean{
@@ -121,7 +123,7 @@ class Task {
     }
 
     public atLine(lineToCheck: number): boolean{
-        return (this.getLine == lineToCheck);
+        return (this.getLine === lineToCheck);
     }
     public insertTimeStamp(){
 		const activeEditor = vscode.window.activeTextEditor;
@@ -185,27 +187,64 @@ class Task {
         
         return text; 
     }
+    public promote(){
+        var newStatus: number;
+        if (this._state === 3){
+            this.toggleStatus(0);
+        }
+        else{
+            this.toggleStatus(this._state + 1);
+        }
+    }
 
-    public toggleStatus(){
+    public demote(){
+        var newStatus: number;
+        if (this._state === 0){
+            this.toggleStatus(3);
+        }
+        else{
+            this.toggleStatus(this._state - 1);
+        }
+    }
+
+    public toggleStatus(newStatus: number){
         const activeEditor = vscode.window.activeTextEditor;
 		if (activeEditor) {
-            const start = new vscode.Position(this.getLine,this._line.indexOf("-") + 3);
-            const end = new vscode.Position(this.getLine,this._line.indexOf("-") + 4);
+            var prefix = this.taskPrefix(this._state);
+            var start;
+            var end;
+            
+            if (prefix.length === 0)
+            {
+                const line = this._line;
+                const offset = line.length - line.trimStart().length;
+                start = new vscode.Position(this.getLine, offset);
+                end = new vscode.Position(this.getLine, offset);
+            }
+            else{
+                start = new vscode.Position(this.getLine,this._line.indexOf(prefix));
+                end = new vscode.Position(this.getLine,this._line.indexOf(prefix) + prefix.length);
+            }
             const rgToReplace = new vscode.Range(start,end);
+            const newPrefix = this.taskPrefix(newStatus);
             activeEditor.edit(editBuilder =>{
-                if (this.isDone){
-                    
-                    editBuilder.replace(rgToReplace,TASK_INWORK);
-                }
-                else
-                {
-                    editBuilder.replace(rgToReplace,TASK_DONE);
-                }
+                editBuilder.replace(rgToReplace,newPrefix);
             });
+            this._state = newStatus;
         };
     }
-    private taskPrefix(status:string):string{
-        return (TASK_IDENT + status +"]");
+    private taskPrefix(status:number):string{
+        var prefix: string = "";
+        if (status === 1){
+            prefix = BULLET_IDENT;
+        }
+        else if (status === 2){
+            prefix = TASK_IDENT + TASK_INWORK +"] ";
+        }
+        else if (status === 3){
+            prefix = TASK_IDENT + TASK_DONE + "] ";
+        }
+        return prefix;
     }
 
     static timeStamps(line: string):Date[] {
@@ -218,7 +257,7 @@ class Task {
             var endTask = line.indexOf("]");
             if (endTask > -1){
                 var data = line.substring(1,endTask);
-                if (data.length == dateScheme.length) {
+                if (data.length === dateScheme.length) {
                     content.push(new Date(data));
                 }
                 line = line.substring(endTask +1);
@@ -232,7 +271,7 @@ class Task {
 
     private makeTitle(line: string): string{
         var formattedTitle:string = line.trimStart();
-        formattedTitle = formattedTitle.substring((TASK_IDENT+" ] ").length);
+        formattedTitle = formattedTitle.substring(this.taskPrefix(this._state).length);
         const idxFirstTag = formattedTitle.indexOf("[");
         if (idxFirstTag > 0){
             formattedTitle = formattedTitle.substring(0,idxFirstTag);
@@ -240,13 +279,26 @@ class Task {
         formattedTitle = formattedTitle.trimEnd(); 
         return (formattedTitle);
     }
-
+    private makeState(line: string): number{
+        var arrayToCheck =[3,2,1,0];
+        var formattedLine = line.trimStart();
+        var estimatedState:number = 0; 
+        arrayToCheck.every(element => {
+            if (formattedLine.startsWith(this.taskPrefix(element))){
+                estimatedState = element;
+                return false;
+            }
+            return true;
+        });
+        return estimatedState;
+    }
     constructor(textEditor: vscode.TextEditor,range: vscode.Range) {
         this._textEditor = textEditor || null;
         this._range = range || null;
         this._line = this._textEditor.document.getText(this._range)|| null;
-        this._toggles = Task.timeStamps(this._line.substring(3));
+        this._state = this.makeState(this._line);
         this._title = this.makeTitle(this._line) || null;
+        this._toggles = Task.timeStamps(this._line.substring(this.taskPrefix(this._state).length));
     }
 }
 
