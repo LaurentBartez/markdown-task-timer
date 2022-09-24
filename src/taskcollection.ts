@@ -21,7 +21,13 @@ class TaskCollection extends Array<Task> {
 	get getTimeTables(){
 		const dataForge = require('data-forge');
 		function getMd(df: any){
+			df = df.withSeries({
+				duration: (df: any) => df.deflate((row: any) => row.duration)
+				.select((value: any) => value.toFixed(2))
+
+			});
 			df = df.toStrings("duration");
+
 			const header = df.getColumnNames();
 			const rows = df.toRows();
 			const tableData = {
@@ -33,6 +39,7 @@ class TaskCollection extends Array<Task> {
 
 			return getMarkdownTable(tableData);
 		};
+
 		var df = new dataForge.DataFrame({columns:this.getEntries});
 		df = df.orderBy((row: { start: any; }) => row.start);
 	
