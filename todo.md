@@ -9,13 +9,25 @@
 - [x] indicate duration on attachment in case of timestamps
 - [x] hide status timer when not active
 - [x] cycle todo status
+- [ ] add total sum to each table
+
+## bugs
+
+- [x] duration rounding
+- [x] report creation when task is active
+- [x] sorting for report by date not working
+- [ ] shortcut for timer toggle is bad
+- [ ] when timer is active there -> hover at start toggle shows one entry only 
 
 ## Not so fun work
 
-- [x] make readme
+- [ ] make readme
+  - [ ] create icon
+  - [ ] explain usage
 
 # After publish
 
+- [ ] csv export?
 - [ ] add command where click on timer sets cursor at task in editor
 - [ ] show daily report on hover when date is selected + adjacent timestamps
 - [ ] create shortcuts to create task from line

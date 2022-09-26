@@ -41,9 +41,9 @@ class TaskCollection extends Array<Task> {
 		};
 
 		var df = new dataForge.DataFrame({columns:this.getEntries});
-		df = df.orderBy((row: { start: any; }) => row.start);
-	
-		var startDays = df.getSeries('startDay');
+		df = df.orderBy((row: { startEntry: any; }) => row.startEntry);
+		console.log(df.toArray());
+		const startDays = df.getSeries('startDay');
 		const uniqueDays = startDays.distinct();
 
 		// make dailies
@@ -93,7 +93,9 @@ class TaskCollection extends Array<Task> {
 		var starts: string[] =[];
 		var ends: string[] =[];
 		var durations:number[]  =[];
+		var startEntries:number[]  =[];
 		var startDays:string[]  =[];
+
 
 		this.forEach(task=>{
 			var timeEntries = task.getTable;
@@ -101,9 +103,16 @@ class TaskCollection extends Array<Task> {
 				
 					titles.push(task.getTitle);
 					starts.push(moment(element._start.getTime()).format('HH:mm'));
-					ends.push(moment(element._end.getTime()).format('HH:mm'));
+					if (element._end !== null){
+						ends.push(moment(element._end.getTime()).format('HH:mm'));
+					}
+					else{
+						ends.push("");
+					}
 					durations.push(element._durationMs / 1000 / 60 / 60);
 					startDays.push(moment(element._start.getTime()).format('YYYY-MM-DD'));
+					startEntries.push(element._start.getTime());
+
 				
 			});
 		});
@@ -112,8 +121,8 @@ class TaskCollection extends Array<Task> {
 			start: starts,
 			end: ends,
 			duration: durations,
-			startDay: startDays
-		
+			startDay: startDays,
+			startEntry: startEntries
 		};
 		return data;
 	}
