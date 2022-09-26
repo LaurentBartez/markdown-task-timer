@@ -52,15 +52,20 @@ class TaskCollection extends Array<Task> {
 
 		uniqueDays.forEach((day: any) => {
 			var filtered = df.where((row:any) => row.startDay === day);
+			const sum = filtered.getSeries('duration').sum().toFixed(2);
 			
 			timeTable += "### " + day.toString() + "\n\n";
+			
 			timeTable += getMd(filtered.subset(['title','start','end','duration']));
 			timeTable += "\n\n";
+			timeTable += "Total duration: " + sum + "h\n\n";
 
 			durationTable += "### " + day.toString() + "\n\n";
+			
 			const pivotted = filtered.pivot("title", "duration", (series: { sum: () => any; }) => series.sum());
 			durationTable += getMd(pivotted.subset(['title','duration']));
 			durationTable += "\n\n";
+			durationTable += "Total duration: " + sum + "h\n\n";
 
 		});
 

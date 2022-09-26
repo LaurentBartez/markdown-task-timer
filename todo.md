@@ -9,7 +9,7 @@
 - [x] indicate duration on attachment in case of timestamps
 - [x] hide status timer when not active
 - [x] cycle todo status
-- [ ] add total sum to each table
+- [x] add total sum to each table
 
 ## bugs
 
