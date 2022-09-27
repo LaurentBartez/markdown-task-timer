@@ -163,7 +163,7 @@ class Task {
             {
                 /// timestamp started a task
                 text.appendMarkdown('**' + timeStamp +'** - ');
-                if (!this.isActive)
+                if (indexSelected < this._toggles.length -1)
                 {
                     const indexAdjacent = indexSelected + 1; 
                     text.appendMarkdown((moment(this._toggles[indexAdjacent])).format('YYYY-MM-DD HH:mm'));    

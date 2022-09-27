@@ -17,7 +17,7 @@
 - [x] report creation when task is active
 - [x] sorting for report by date not working
 - [ ] shortcut for timer toggle is bad
-- [ ] when timer is active there -> hover at start toggle shows one entry only 
+- [x] when timer is active there -> hover at start toggle shows one entry only 
 
 ## Not so fun work
 
