@@ -14,7 +14,7 @@ Add timers to your markdown todo-list and get a report summarizing your efforts.
 
 This extension contributes the following commands:
 
-- `markdown-todo-timer.toggleTimer (ctrl+alt+[Minus])`: Toggles the timer. Active tasks will be set inactive. If there is no active tasks, the selected task will be toggled to active 
+- `markdown-todo-timer.toggleTimer (ctrl+alt+l)`: Toggles the timer. Active tasks will be set inactive. If there is no active tasks, the selected task will be toggled to active 
 - `markdown-todo-timer.promoteTask (ctrl+alt+[Period])`: Cycles through task state promoting
 - `markdown-todo-timer.promoteTask (ctrl+alt+[Comma])`: Cycles through task state demoting    
 - `markdown-todo-timer.makeReport`: Creates a report that summarizes your timestamps in a new editor. Of course formatted as markdown 

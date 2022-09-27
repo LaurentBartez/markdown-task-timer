@@ -45,7 +45,7 @@
     "keybindings": [
       {
         "command": "markdown-todo-timer.toggleTimer",
-        "key": "ctrl+alt+[Minus]",
+        "key": "ctrl+alt+l",
         "when": "editorTextFocus && editorLangId == 'markdown'"
       },
       {
