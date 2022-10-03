@@ -1,7 +1,7 @@
 {
-  "name": "markdown-todo-timer",
-  "displayName": "Markdown Todo Timer",
-  "publisher": "ThomasKnorr",
+  "name": "markdown-task-timer",
+  "displayName": "Markdown Task Timer",
+  "publisher": "Thomas Knorr",
   "description": "Start logging work-effort on your markdown todo list.",
   "version": "0.0.1",
   "engines": {
@@ -10,11 +10,16 @@
   "license": "SEE LICENSE IN License.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LaurentBartez/markdown-todo-timer.git"
+    "url": "https://github.com/LaurentBartez/markdown-task-timer.git"
   },
   "categories": [
     "Other"
   ],
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#C80000",
+    "theme": "dark"
+  },
   "activationEvents": [
     "onLanguage:markdown"
   ],
@@ -22,39 +27,39 @@
   "contributes": {
     "commands": [
       {
-        "command": "markdown-todo-timer.toggleTimer",
+        "command": "markdown-task-timer.toggleTimer",
         "title": "Toggle timer",
         "category": "Markdown Todo Timer"
       },
       {
-        "command": "markdown-todo-timer.promoteTask",
+        "command": "markdown-task-timer.promoteTask",
         "title": "Promote task",
         "category": "Markdown Todo Timer"
       },
       {
-        "command": "markdown-todo-timer.demoteTask",
+        "command": "markdown-task-timer.demoteTask",
         "title": "Demote task",
         "category": "Markdown Todo Timer"
       },
       {
-        "command": "markdown-todo-timer.makeReport",
+        "command": "markdown-task-timer.makeReport",
         "title": "Make report",
         "category": "Markdown Todo Timer"
       }
     ],
     "keybindings": [
       {
-        "command": "markdown-todo-timer.toggleTimer",
+        "command": "markdown-task-timer.toggleTimer",
         "key": "ctrl+alt+l",
         "when": "editorTextFocus && editorLangId == 'markdown'"
       },
       {
-        "command": "markdown-todo-timer.promoteTask",
+        "command": "markdown-task-timer.promoteTask",
         "key": "ctrl+alt+[Period]",
         "when": "editorTextFocus && editorLangId == 'markdown'"
       },
       {
-        "command": "markdown-todo-timer.demoteTask",
+        "command": "markdown-task-timer.demoteTask",
         "key": "ctrl+alt+[Comma]",
         "when": "editorTextFocus && editorLangId == 'markdown'"
       }
