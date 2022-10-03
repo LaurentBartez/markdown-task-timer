@@ -1,4 +1,4 @@
-# Markdown Todo Timer 
+# Markdown Task Timer 
 
 Add timers to your markdown todo-list and get a report summarizing your efforts. 
 
