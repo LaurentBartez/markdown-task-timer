@@ -27,9 +27,14 @@ Use `ctrl+alt+[Period]` for promoting, or `ctrl+alt+[Comma]` for demoting text l
 
 ## Release Notes
 
+### 0.2.0
+
+official release
+
+
 ### 0.1.0
 
-Initial release
+Initial preview release
 
 ## For more information
 
