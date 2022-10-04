@@ -1,7 +1,7 @@
 {
   "name": "markdown-task-timer",
   "displayName": "Markdown Task Timer",
-  "publisher": "Thomas Knorr",
+  "publisher": "ThomasKnorr",
   "description": "Start logging work-effort on your markdown task list.",
   "version": "0.1.0",
   "preview": true,
