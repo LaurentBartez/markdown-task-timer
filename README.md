@@ -1,6 +1,6 @@
 # Markdown Task Timer 
 
-Add timers to your markdown todo-list and get a report summarizing your efforts. 
+Add timers to your markdown task-list and get a report summarizing your efforts. 
 
 ## Features
 
@@ -10,22 +10,26 @@ Add timers to your markdown todo-list and get a report summarizing your efforts.
 - make a comprehensive report
 - cycle through task state with key-shortcuts (text -> bullet -> in work -> done -> text)  
 
-## Extension Settings
+## Usage
 
-This extension contributes the following commands:
+Place cursor in a line with a markdown task and press `ctrl+alt+l` to add a timestamp. Existing active tasks will be set inactive before a new one is activated. A timer in the status bar indicates the elapsed time of the current active task.
 
-- `markdown-todo-timer.toggleTimer (ctrl+alt+l)`: Toggles the timer. Active tasks will be set inactive. If there is no active tasks, the selected task will be toggled to active 
-- `markdown-todo-timer.promoteTask (ctrl+alt+[Period])`: Cycles through task state promoting
-- `markdown-todo-timer.promoteTask (ctrl+alt+[Comma])`: Cycles through task state demoting    
-- `markdown-todo-timer.makeReport`: Creates a report that summarizes your timestamps in a new editor. Of course formatted as markdown 
+![add timer](images/log.gif)
+
+Use the `makeReport`-Command to get a markdown-formatted summary of your timestamps. 
+
+![make report](images/make-Report.gif)
 
 
-## Known Issues
+Use `ctrl+alt+[Period]` for promoting, or `ctrl+alt+[Comma]` for demoting text lines to 'done'-state or vice-versa.
 
-tbd
+![cycle status](images/cycle.gif)
+
 ## Release Notes
 
-unreleased
+### 0.1.0
+
+Initial release
 
 ## For more information
 

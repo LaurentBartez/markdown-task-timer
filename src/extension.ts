@@ -11,7 +11,7 @@ import TimerStatusBarItem from "./timerStatusBarItem";
 export function activate(context: vscode.ExtensionContext) {
 	
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "markdown-todo-timer" is now active!');
+	console.log('Congratulations, your extension "markdown-task-timer" is now active!');
 	const statusBarItem = new TimerStatusBarItem();
 
 	function handleTimer(){
@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// This function shall toggle a timer for a given task.
 	// if an active task is in editor it will be toggled whereever it is
 	// in case of no active task, the one in selected line will be toggled
-	let disposable = vscode.commands.registerCommand('markdown-todo-timer.toggleTimer', () => {
+	let disposable = vscode.commands.registerCommand('markdown-task-timer.toggleTimer', () => {
 		
 		//check if selected line is a task
 		const activeEditor = vscode.window.activeTextEditor;
@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
-	disposable = vscode.commands.registerCommand('markdown-todo-timer.promoteTask', () => {
+	disposable = vscode.commands.registerCommand('markdown-task-timer.promoteTask', () => {
 		
 		//check if selected line is a task
 		const activeEditor = vscode.window.activeTextEditor;
@@ -90,7 +90,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 	
-	disposable = vscode.commands.registerCommand('markdown-todo-timer.demoteTask', () => {
+	disposable = vscode.commands.registerCommand('markdown-task-timer.demoteTask', () => {
 		
 		//check if selected line is a task
 		const activeEditor = vscode.window.activeTextEditor;
@@ -105,7 +105,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 
 
-	disposable = vscode.commands.registerCommand('markdown-todo-timer.makeReport', () => {
+	disposable = vscode.commands.registerCommand('markdown-task-timer.makeReport', () => {
 		
 		//check if selected line is a task
 		const activeEditor = vscode.window.activeTextEditor;

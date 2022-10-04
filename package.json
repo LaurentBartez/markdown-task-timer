@@ -2,8 +2,9 @@
   "name": "markdown-task-timer",
   "displayName": "Markdown Task Timer",
   "publisher": "Thomas Knorr",
-  "description": "Start logging work-effort on your markdown todo list.",
-  "version": "0.0.1",
+  "description": "Start logging work-effort on your markdown task list.",
+  "version": "0.1.0",
+  "preview": true,
   "engines": {
     "vscode": "^1.71.0"
   },
@@ -12,14 +13,20 @@
     "type": "git",
     "url": "https://github.com/LaurentBartez/markdown-task-timer.git"
   },
+  "bugs": {
+    "url": "https://github.com/LaurentBartez/markdown-task-timer/issues"
+  },
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "Markdown",
+    "Todo",
+    "Logging",
+    "Timer",
+    "Task"
+  ],
   "icon": "images/icon.png",
-  "galleryBanner": {
-    "color": "#C80000",
-    "theme": "dark"
-  },
   "activationEvents": [
     "onLanguage:markdown"
   ],
@@ -29,22 +36,22 @@
       {
         "command": "markdown-task-timer.toggleTimer",
         "title": "Toggle timer",
-        "category": "Markdown Todo Timer"
+        "category": "Markdown Task Timer"
       },
       {
         "command": "markdown-task-timer.promoteTask",
         "title": "Promote task",
-        "category": "Markdown Todo Timer"
+        "category": "Markdown Task Timer"
       },
       {
         "command": "markdown-task-timer.demoteTask",
         "title": "Demote task",
-        "category": "Markdown Todo Timer"
+        "category": "Markdown Task Timer"
       },
       {
         "command": "markdown-task-timer.makeReport",
         "title": "Make report",
-        "category": "Markdown Todo Timer"
+        "category": "Markdown Task Timer"
       }
     ],
     "keybindings": [

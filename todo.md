@@ -22,7 +22,7 @@
 ## Not so fun work
 
 - [ ] make readme
-  - [ ] create icon
+  - [x] create icon
   - [ ] explain usage
 
 # After publish
