@@ -31,7 +31,7 @@
 
 ### Bugs
 
-- [ ] update timer after editing of document
+- [x] update timer after editing of document
 
 ### Features
 - [ ] workspace support

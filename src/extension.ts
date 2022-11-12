@@ -54,8 +54,6 @@ export function activate(context: vscode.ExtensionContext) {
 				if (element.atLine(currentLine))
 				{
 					element.insertTimeStamp();
-					console.log("Started timer for: " + element.getTitle);
-					statusBarItem.setTask(element);
 				}
 			});
 		}
@@ -63,15 +61,6 @@ export function activate(context: vscode.ExtensionContext) {
 		{
 			//one active task is there
 			activeTasks[0].insertTimeStamp();
-			console.log("Stopped timer for: " + activeTasks[0].getTitle);
-			if (activeTasks.length === 1)
-			{
-				statusBarItem.removeTask();
-			}
-			else
-			{
-				statusBarItem.setTask(activeTasks[1]);
-			}
 		}
 	});
 
@@ -153,10 +142,8 @@ export function activate(context: vscode.ExtensionContext) {
 				const decoration = { range: element.getRange};
 				taskDeco.push(decoration);		
 			}	
-			
 		});
 		activeEditor.setDecorations(activeTaskDecorationType, taskDeco);
-
 	}
 
 	function triggerUpdateDecorations(throttle = false) {
@@ -185,6 +172,16 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.workspace.onDidChangeTextDocument(event => {
 		if (activeEditor && event.document === activeEditor.document) {
 			triggerUpdateDecorations(true);
+			const tasks:TaskCollection = new TaskCollection(activeEditor);
+			const activeTasks = tasks.getActiveTasks();
+			if (activeTasks.length === 0)
+			{
+				statusBarItem.removeTask();
+			}
+			else
+			{
+				statusBarItem.setTask(activeTasks[0]);
+			}
 		}
 	}, null, context.subscriptions);
 
@@ -215,8 +212,6 @@ export function activate(context: vscode.ExtensionContext) {
 					return new vscode.Hover(task.getInfo,range);
 				}
 			}
-
-
         }
     });
 	handleTimer();
