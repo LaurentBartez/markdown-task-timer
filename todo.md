@@ -1,6 +1,8 @@
-# Before publish
+# Roadmap
 
-## Fun ideas 
+## Before publish
+
+### Fun ideas 
 
 - [x] make class for Task-Collection to improve encapsulation [2022-09-22 20:37] [2022-09-22 20:38]
 - [x] create shortcuts to toggle state between done and todo
@@ -11,7 +13,7 @@
 - [x] cycle todo status
 - [x] add total sum to each table
 
-## bugs
+### Bugs
 
 - [x] duration rounding
 - [x] report creation when task is active
@@ -19,19 +21,29 @@
 - [x] shortcut for timer toggle is bad
 - [x] when timer is active there -> hover at start toggle shows one entry only 
 
-## Not so fun work
+### Not so fun work
 
-- [ ] make readme
+- [x] make readme
   - [x] create icon
-  - [ ] explain usage
+  - [x] explain usage
 
-# After publish
+## next release
 
-- [ ] csv export?
+### Bugs
+
+- [ ] update timer after editing of document
+
+### Features
+- [ ] workspace support
+
+## Backlog
+
 - [ ] add command where click on timer sets cursor at task in editor
+- [ ] support other keywords
 - [ ] show daily report on hover when date is selected + adjacent timestamps
-- [ ] create shortcuts to create task from line
+- [x] create shortcuts to create task from line -> solved with cycling
 - [ ] add pomodoro mode in timer
         settings for pomom short long
         show symbols in time
         show notification for pomo status change 
+- [ ] csv export?
