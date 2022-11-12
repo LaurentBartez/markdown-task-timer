@@ -34,12 +34,13 @@
 - [x] update timer after editing of document
 
 ### Features
+- [x] add command where click on timer selects task in editor
 - [ ] workspace support
 
 ## Backlog
 
-- [ ] add command where click on timer sets cursor at task in editor
 - [ ] support other keywords
+- [ ] indicate gaps in timetable
 - [ ] show daily report on hover when date is selected + adjacent timestamps
 - [x] create shortcuts to create task from line -> solved with cycling
 - [ ] add pomodoro mode in timer

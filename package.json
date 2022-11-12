@@ -52,7 +52,13 @@
         "command": "markdown-task-timer.makeReport",
         "title": "Make report",
         "category": "Markdown Task Timer"
+      },
+      {
+        "command": "markdown-task-timer.GoToActiveTask",
+        "title": "Go to active task",
+        "category": "Markdown Task Timer"
       }
+
     ],
     "keybindings": [
       {

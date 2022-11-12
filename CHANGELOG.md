@@ -2,6 +2,9 @@
 
 ## [0.3.0]
 
+### Features
+
+- Click on timer selects task in editor. Files are opened if required.
 ### Bugfixes
 - Timer updates after editing active document
 ## [0.2.0]

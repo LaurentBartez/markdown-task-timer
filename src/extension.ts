@@ -111,6 +111,14 @@ export function activate(context: vscode.ExtensionContext) {
 		});	});
 	context.subscriptions.push(disposable);
 
+	disposable = vscode.commands.registerCommand('markdown-task-timer.GoToActiveTask', () => {
+		
+		//Sets cursor to the current active task of timer
+		statusBarItem.goToTask();
+
+	});
+	context.subscriptions.push(disposable);
+
 
 	context.subscriptions.push(statusBarItem);
 

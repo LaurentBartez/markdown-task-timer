@@ -118,6 +118,10 @@ class Task {
     get isStarted(): boolean{
         return this._toggles.length > 0;
     }
+
+    get fileName(): string{
+        return this._textEditor.document.fileName;
+    }
     public getTimeStamp(index: number){
         return this._toggles[index];
     }
