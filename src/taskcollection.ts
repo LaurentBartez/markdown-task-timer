@@ -6,7 +6,7 @@ import { Align, getMarkdownTable } from 'markdown-table-ts';
 
 
 class TaskCollection extends Array<Task> {
-    _textEditor: vscode.TextEditor;
+    _document: vscode.TextDocument;
 
     public getActiveTasks(): Task[]{
 		let activeTasks:Task[] = [];
@@ -133,26 +133,26 @@ class TaskCollection extends Array<Task> {
 	}
     private getTasks(){
 		var tasks:Task[] = [];
-		if (!this._textEditor) {
-			return;
-		}
+		// if (!this._textEditor) {
+		// 	return;
+		// }
 		const regEx = /- \[x\]|- \[ \]/g;
-		const text = this._textEditor.document.getText();
+		const text = this._document.getText();
 
 		let match;
 		const taskDeco: vscode.DecorationOptions[] = [];
 
 		while ((match = regEx.exec(text))) {
  
-			const startPos = this._textEditor.document.positionAt(match.index);
-			const endPos = this._textEditor.document.lineAt(startPos).range.end;
+			const startPos = this._document.positionAt(match.index);
+			const endPos = this._document.lineAt(startPos).range.end;
 
-			this.push(new Task(this._textEditor,new vscode.Range(startPos, endPos)));
+			this.push(new Task(this._document,new vscode.Range(startPos, endPos)));
 		}		
 	}
-    constructor(textEditor: vscode.TextEditor,...items: Task[]) {
+    constructor(document: vscode.TextDocument,...items: Task[]) {
         super(...items);
-        this._textEditor = textEditor || null;
+        this._document = document || null;
         this.getTasks();
 
     }

@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		const tasks:TaskCollection = new TaskCollection(activeEditor);
+		const tasks:TaskCollection = new TaskCollection(activeEditor.document);
 		const activeTasks = tasks.getActiveTasks();
 
 		if (activeTasks.length > 0)
@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		else
 		{
-			statusBarItem.removeTask;
+			statusBarItem.removeTask();
 		}
 	}
 
@@ -43,24 +43,50 @@ export function activate(context: vscode.ExtensionContext) {
 		if (!activeEditor) {
 			return;
 		}
-
-		const tasks:TaskCollection = new TaskCollection(activeEditor);
+		const tasks: TaskCollection = new TaskCollection(activeEditor.document);
 		const activeTasks = tasks.getActiveTasks();
-		
+
 		const currentLine = activeEditor.selection.active.line;
-		if (activeTasks.length === 0){
+		if (activeTasks.length === 0) {
 			//no task is active start task in current line, if any
 			tasks.forEach(element => {
-				if (element.atLine(currentLine))
-				{
-					element.insertTimeStamp();
+				if (element.atLine(currentLine)) {
+					if (!statusBarItem.isActive())
+					{
+						element.insertTimeStamp();
+					}
+					else {
+						const fileInStatusBar = statusBarItem.fileName;
+						const rangeInStatusBar = statusBarItem.range;
+						statusBarItem.removeTaskAndInsertTimeStamp();
+						vscode.window
+						.showInformationMessage("Stopped a task in a different file. Toggle timer again to start this one.", "Go to stopped task")
+						.then(answer => {
+							if (answer === "Go to stopped task") {
+								vscode.workspace.openTextDocument(fileInStatusBar).then(doc => {
+									const activeTask = new Task(doc, rangeInStatusBar);
+									activeTask.goToTask();
+								});
+							}
+						});
+					}
 				}
 			});
 		}
-		else
-		{
+		else {
 			//one active task is there
+			var activeTaskInDifferentFile = !statusBarItem.updateIsPossible(activeEditor.document);
 			activeTasks[0].insertTimeStamp();
+			if (statusBarItem.isActive() && statusBarItem.fileName !== activeTasks[0].fileName)
+			{
+				vscode.window
+				.showInformationMessage("An task in this editor was set to inactive. However, the timer is still active from a task in a different file","Go to task")
+				.then(answer => {
+					if(answer === "Go to task"){
+						statusBarItem.goToTask();
+					}
+				});
+			}
 		}
 	});
 
@@ -73,7 +99,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		const task = new Task(activeEditor,activeEditor.document.lineAt(activeEditor.selection.active.line).range);
+		const task = new Task(activeEditor.document,activeEditor.document.lineAt(activeEditor.selection.active.line).range);
 		task.promote();
 
 	});
@@ -87,7 +113,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		const task = new Task(activeEditor,activeEditor.document.lineAt(activeEditor.selection.active.line).range);
+		const task = new Task(activeEditor.document,activeEditor.document.lineAt(activeEditor.selection.active.line).range);
 		task.demote();
 
 	});
@@ -101,7 +127,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if (!activeEditor) {
 			return;
 		}
-		var tasks = new TaskCollection(activeEditor);
+		var tasks = new TaskCollection(activeEditor.document);
 		const timeTable: string = tasks.getTimeTables; 
 		vscode.workspace.openTextDocument({
 			content: timeTable,
@@ -143,7 +169,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const taskDeco: vscode.DecorationOptions[] = [];
-		const tasks:TaskCollection = new TaskCollection(activeEditor);
+		const tasks:TaskCollection = new TaskCollection(activeEditor.document);
 
 		tasks.forEach(element => {
 			if (element.isActive){
@@ -174,22 +200,14 @@ export function activate(context: vscode.ExtensionContext) {
 		activeEditor = editor;
 		if (editor) {
 			triggerUpdateDecorations();
+			statusBarItem.updateTimer(editor.document);
 		}
 	}, null, context.subscriptions);
 
 	vscode.workspace.onDidChangeTextDocument(event => {
 		if (activeEditor && event.document === activeEditor.document) {
 			triggerUpdateDecorations(true);
-			const tasks:TaskCollection = new TaskCollection(activeEditor);
-			const activeTasks = tasks.getActiveTasks();
-			if (activeTasks.length === 0)
-			{
-				statusBarItem.removeTask();
-			}
-			else
-			{
-				statusBarItem.setTask(activeTasks[0]);
-			}
+			statusBarItem.updateTimer(activeEditor.document);
 		}
 	}, null, context.subscriptions);
 
@@ -206,7 +224,7 @@ export function activate(context: vscode.ExtensionContext) {
 				const regExTimeStamp = /\[(.*?)\]/g;
 				const range = document.lineAt(position).range;
 				
-				var task = new Task(activeEditor,range);
+				var task = new Task(activeEditor.document,range);
 				const wordRange = document.getWordRangeAtPosition(position, regExTimeStamp);
 				const timeInfo = task.timeStampInfo(document.getText(wordRange).slice(1,-1));
 				console.log(timeInfo);

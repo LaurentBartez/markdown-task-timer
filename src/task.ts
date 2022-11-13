@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as moment from 'moment';
 import TimeEntry from './timeEntry';
+import { text } from 'stream/consumers';
 
 const TASK_DONE: string = "x";
 const TASK_INWORK: string = " ";
@@ -9,7 +10,7 @@ const TASK_IDENT: string = BULLET_IDENT + "[";
 const TIMESTAMP_FORMAT: string = "YYYY-MM-DD HH:mm";
 
 class Task {
-    _textEditor: vscode.TextEditor;
+    _document: vscode.TextDocument;
     _title: any;
     _toggles: any;
     _line: any;
@@ -120,7 +121,7 @@ class Task {
     }
 
     get fileName(): string{
-        return this._textEditor.document.fileName;
+        return this._document.fileName;
     }
     public getTimeStamp(index: number){
         return this._toggles[index];
@@ -130,15 +131,23 @@ class Task {
         return (this.getLine === lineToCheck);
     }
     public insertTimeStamp(){
-		const activeEditor = vscode.window.activeTextEditor;
-		if (activeEditor) {
+		// const activeEditor = this._textEditor;
+		// if (activeEditor) {
             const currentDate = Date.now();
             this._toggles.push(currentDate);
 			const formattedDate = (moment(currentDate)).format('YYYY-MM-DD HH:mm');
-			activeEditor.edit(editBuilder => {
-				editBuilder.insert(this.getRange.end, " [" + formattedDate + "]");
-			});
-		}
+            var t = this._document.getText(this._range);
+            t += " [" + formattedDate + "]";
+            const textEdits: vscode.TextEdit[] = [];
+            var tEdit = new vscode.TextEdit(this._range, t);
+            textEdits.push(tEdit);
+            const workEdit = new vscode.WorkspaceEdit();
+            workEdit.set(this._document.uri,textEdits);
+            vscode.workspace.applyEdit(workEdit);
+            // activeEditor.edit(editBuilder => {
+			// 	editBuilder.insert(this.getRange.end, " [" + formattedDate + "]");
+			// });
+		// }
 	}
 
     ///function to get infotext for a given timestamp
@@ -210,10 +219,19 @@ class Task {
             this.toggleStatus(this._state - 1);
         }
     }
+    public goToTask(){
+        var openPath = vscode.Uri.file(this.fileName);
+        vscode.workspace.openTextDocument(openPath).then(doc => {
+        vscode.window.showTextDocument(doc).then(editor => {
+        editor.selections = [new vscode.Selection(this._range.start, this._range.end)];
+        editor.revealRange(new vscode.Range(this._range.start, this._range.end));
+      });
+    });
+}
 
     public toggleStatus(newStatus: number){
-        const activeEditor = vscode.window.activeTextEditor;
-		if (activeEditor) {
+        // const activeEditor = this._textEditor;
+		// if (activeEditor) {
             var prefix = this.taskPrefix(this._state);
             var start;
             var end;
@@ -231,11 +249,22 @@ class Task {
             }
             const rgToReplace = new vscode.Range(start,end);
             const newPrefix = this.taskPrefix(newStatus);
-            activeEditor.edit(editBuilder =>{
-                editBuilder.replace(rgToReplace,newPrefix);
-            });
+            // var t = this._document.getText(this._range);
+            // t += " [" + formattedDate + "]";
+
+
+            const textEdits: vscode.TextEdit[] = [];
+            var tEdit = new vscode.TextEdit(rgToReplace, newPrefix);
+            textEdits.push(tEdit);
+            const workEdit = new vscode.WorkspaceEdit();
+            workEdit.set(this._document.uri,textEdits);
+            vscode.workspace.applyEdit(workEdit);
+
+            // activeEditor.edit(editBuilder =>{
+            //     editBuilder.replace(rgToReplace,newPrefix);
+            // });
             this._state = newStatus;
-        };
+        // };
     }
     private taskPrefix(status:number):string{
         var prefix: string = "";
@@ -296,10 +325,10 @@ class Task {
         });
         return estimatedState;
     }
-    constructor(textEditor: vscode.TextEditor,range: vscode.Range) {
-        this._textEditor = textEditor || null;
+    constructor(document: vscode.TextDocument,range: vscode.Range) {
+        this._document = document || null;
         this._range = range || null;
-        this._line = this._textEditor.document.getText(this._range)|| null;
+        this._line = this._document.getText(this._range)|| null;
         this._state = this.makeState(this._line);
         this._title = this.makeTitle(this._line) || null;
         this._toggles = Task.timeStamps(this._line.substring(this.taskPrefix(this._state).length));
