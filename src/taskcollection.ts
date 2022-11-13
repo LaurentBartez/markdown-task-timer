@@ -133,9 +133,6 @@ class TaskCollection extends Array<Task> {
 	}
     private getTasks(){
 		var tasks:Task[] = [];
-		// if (!this._textEditor) {
-		// 	return;
-		// }
 		const regEx = /- \[x\]|- \[ \]/g;
 		const text = this._document.getText();
 

@@ -131,8 +131,6 @@ class Task {
         return (this.getLine === lineToCheck);
     }
     public insertTimeStamp(){
-		// const activeEditor = this._textEditor;
-		// if (activeEditor) {
             const currentDate = Date.now();
             this._toggles.push(currentDate);
 			const formattedDate = (moment(currentDate)).format('YYYY-MM-DD HH:mm');
@@ -144,10 +142,6 @@ class Task {
             const workEdit = new vscode.WorkspaceEdit();
             workEdit.set(this._document.uri,textEdits);
             vscode.workspace.applyEdit(workEdit);
-            // activeEditor.edit(editBuilder => {
-			// 	editBuilder.insert(this.getRange.end, " [" + formattedDate + "]");
-			// });
-		// }
 	}
 
     ///function to get infotext for a given timestamp
@@ -230,8 +224,6 @@ class Task {
 }
 
     public toggleStatus(newStatus: number){
-        // const activeEditor = this._textEditor;
-		// if (activeEditor) {
             var prefix = this.taskPrefix(this._state);
             var start;
             var end;
@@ -249,9 +241,6 @@ class Task {
             }
             const rgToReplace = new vscode.Range(start,end);
             const newPrefix = this.taskPrefix(newStatus);
-            // var t = this._document.getText(this._range);
-            // t += " [" + formattedDate + "]";
-
 
             const textEdits: vscode.TextEdit[] = [];
             var tEdit = new vscode.TextEdit(rgToReplace, newPrefix);
@@ -259,12 +248,7 @@ class Task {
             const workEdit = new vscode.WorkspaceEdit();
             workEdit.set(this._document.uri,textEdits);
             vscode.workspace.applyEdit(workEdit);
-
-            // activeEditor.edit(editBuilder =>{
-            //     editBuilder.replace(rgToReplace,newPrefix);
-            // });
             this._state = newStatus;
-        // };
     }
     private taskPrefix(status:number):string{
         var prefix: string = "";
