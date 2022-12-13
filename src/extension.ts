@@ -19,8 +19,9 @@ export function activate(context: vscode.ExtensionContext) {
 		if (!activeEditor) {
 			return;
 		}
-
-		const tasks:TaskCollection = new TaskCollection(activeEditor.document);
+		var allDocs: vscode.TextDocument[] = new Array();
+		allDocs = [activeEditor.document];
+		const tasks:TaskCollection = new TaskCollection(allDocs);
 		const activeTasks = tasks.getActiveTasks();
 
 		if (activeTasks.length > 0)
@@ -42,8 +43,10 @@ export function activate(context: vscode.ExtensionContext) {
 		const activeEditor = vscode.window.activeTextEditor;
 		if (!activeEditor) {
 			return;
-		}
-		const tasks: TaskCollection = new TaskCollection(activeEditor.document);
+		}		
+		var allDocs: vscode.TextDocument[] = new Array();
+		allDocs = [activeEditor.document];
+		const tasks:TaskCollection = new TaskCollection(allDocs);
 		const activeTasks = tasks.getActiveTasks();
 
 		const currentLine = activeEditor.selection.active.line;
@@ -127,7 +130,11 @@ export function activate(context: vscode.ExtensionContext) {
 		if (!activeEditor) {
 			return;
 		}
-		var tasks = new TaskCollection(activeEditor.document);
+
+		var allDocs: vscode.TextDocument[] = new Array();
+		allDocs = [activeEditor.document];
+		const tasks:TaskCollection = new TaskCollection(allDocs);
+
 		const timeTable: string = tasks.getTimeTables; 
 		vscode.workspace.openTextDocument({
 			content: timeTable,
@@ -169,7 +176,9 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const taskDeco: vscode.DecorationOptions[] = [];
-		const tasks:TaskCollection = new TaskCollection(activeEditor.document);
+		var allDocs: vscode.TextDocument[] = new Array();
+		allDocs = [activeEditor.document];
+		const tasks:TaskCollection = new TaskCollection(allDocs);
 
 		tasks.forEach(element => {
 			if (element.isActive){
