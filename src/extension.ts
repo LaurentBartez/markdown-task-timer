@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import TaskCollection from './taskcollection';
 import Task from './task';
 import TimerStatusBarItem from "./timerStatusBarItem";
-
+import * as moment from 'moment';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -134,33 +134,52 @@ export function activate(context: vscode.ExtensionContext) {
 		var allDocs: vscode.TextDocument[] = new Array();
 		allDocs = [activeEditor.document];
 		const tasks: TaskCollection = new TaskCollection(allDocs);
-		tasks.makeReport();
+		tasks.makeReport(new Date("1900-01-01T00:00:00"),new Date());
 	});
 	context.subscriptions.push(disposable);
 
 	disposable = vscode.commands.registerCommand('markdown-task-timer.makeReportWorkspace',async () => {
 
 		// The code you place here will be executed every time your command is executed
-        const files = await vscode.workspace.findFiles('**/*.md', '**/node_modules/**');
+        var startDefault: Date = new Date("1900-01-01T00:00:00");
+        var endDefault: Date = new Date(); 
 
-		var allDocs: vscode.TextDocument[] = new Array();
+		const startDate = await vscode.window.showInputBox({
+			placeHolder: "YYYY-MM-DD",
+			prompt: "Enter start date for report",
+			value: (moment(startDefault)).format('YYYY-MM-DD')
+		  });
 		
-        for (const file of files){
-			const doc = await vscode.workspace.openTextDocument(file.path);
-			allDocs.push(doc);
-		};
-		
-		if (allDocs.length === 0){
-			vscode.window.showErrorMessage('no markdown files were found in workspace');
+		var endDate;  
+		if (startDate)
+		{
+			endDate = await vscode.window.showInputBox({
+				placeHolder: "YYYY-MM-DD",
+				prompt: "Enter end date for report",
+				value: (moment(endDefault)).format('YYYY-MM-DD')
+			});
 		}
-		else{
-			const tasks: TaskCollection = new TaskCollection(allDocs);
-			if (tasks.length === 0)
-			{
-				vscode.window.showErrorMessage('no tasks were found in workspace');
-			}
 
-			tasks.makeReport();
+		if (startDate && endDate) {
+
+			const files = await vscode.workspace.findFiles('**/*.md', '**/node_modules/**');
+			var allDocs: vscode.TextDocument[] = new Array();
+			for (const file of files) {
+				const doc = await vscode.workspace.openTextDocument(file.path);
+				allDocs.push(doc);
+			};
+
+			if (allDocs.length === 0) {
+				vscode.window.showErrorMessage('no markdown files were found in workspace');
+			}
+			else {
+				const tasks: TaskCollection = new TaskCollection(allDocs);
+				if (tasks.length === 0) {
+					vscode.window.showErrorMessage('no tasks were found in workspace');
+				}
+
+				tasks.makeReport(new Date(startDate + "T00:00:00"), new Date(endDate + "T23:59:59"));
+			}
 		}
 
 	});
