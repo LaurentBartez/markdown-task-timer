@@ -124,7 +124,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	disposable = vscode.commands.registerCommand('markdown-task-timer.makeReport', () => {
-		
+
 		//check if selected line is a task
 		const activeEditor = vscode.window.activeTextEditor;
 		if (!activeEditor) {
@@ -133,15 +133,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 		var allDocs: vscode.TextDocument[] = new Array();
 		allDocs = [activeEditor.document];
-		const tasks:TaskCollection = new TaskCollection(allDocs);
-
-		const timeTable: string = tasks.getTimeTables; 
-		vscode.workspace.openTextDocument({
-			content: timeTable,
-			language: "markdown"
-		}).then(newDocument => {
-			vscode.window.showTextDocument(newDocument);
-		});	});
+		const tasks: TaskCollection = new TaskCollection(allDocs);
+		tasks.makeReport();
+	});
 	context.subscriptions.push(disposable);
 
 	disposable = vscode.commands.registerCommand('markdown-task-timer.GoToActiveTask', () => {

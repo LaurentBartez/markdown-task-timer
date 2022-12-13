@@ -131,6 +131,17 @@ class TaskCollection extends Array<Task> {
 		};
 		return data;
 	}
+
+	public makeReport(){
+		const timeTable: string = this.getTimeTables;
+		vscode.workspace.openTextDocument({
+			content: timeTable,
+			language: "markdown"
+		}).then(newDocument => {
+			vscode.window.showTextDocument(newDocument);
+		});
+	}
+
 	private getTasks() {
 		var tasks: Task[] = [];
 		const regEx = /- \[x\]|- \[ \]/g;
