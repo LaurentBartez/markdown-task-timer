@@ -138,6 +138,35 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 
+	disposable = vscode.commands.registerCommand('markdown-task-timer.makeReportWorkspace',async () => {
+
+		// The code you place here will be executed every time your command is executed
+        const files = await vscode.workspace.findFiles('**/*.md', '**/node_modules/**');
+
+		var allDocs: vscode.TextDocument[] = new Array();
+		
+        for (const file of files){
+			const doc = await vscode.workspace.openTextDocument(file.path);
+			allDocs.push(doc);
+		};
+		
+		if (allDocs.length === 0){
+			vscode.window.showErrorMessage('no markdown files were found in workspace');
+		}
+		else{
+			const tasks: TaskCollection = new TaskCollection(allDocs);
+			if (tasks.length === 0)
+			{
+				vscode.window.showErrorMessage('no tasks were found in workspace');
+			}
+
+			tasks.makeReport();
+		}
+
+	});
+	context.subscriptions.push(disposable);
+
+
 	disposable = vscode.commands.registerCommand('markdown-task-timer.GoToActiveTask', () => {
 		
 		//Sets cursor to the current active task of timer

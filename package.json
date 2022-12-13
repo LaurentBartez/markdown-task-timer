@@ -54,6 +54,11 @@
         "category": "Markdown Task Timer"
       },
       {
+        "command": "markdown-task-timer.makeReportWorkspace",
+        "title": "Make report on workspace",
+        "category": "Markdown Task Timer"
+      },
+      {
         "command": "markdown-task-timer.GoToActiveTask",
         "title": "Go to active task",
         "category": "Markdown Task Timer"
