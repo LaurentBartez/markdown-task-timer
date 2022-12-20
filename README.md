@@ -17,8 +17,17 @@ Place cursor in a line with a markdown task and press `ctrl+alt+l` to add a time
 ![add timer](images/log.gif)
 
 Use the `makeReport`-Command to get a markdown-formatted summary of your timestamps. 
-
 ![make report](images/make-Report.gif)
+
+There is a report for the current document or the complete workspace. The workspace report can be restricted with start and end date. Instead of giving a date in `YYYY-MM-DD` the following keywords can be used to refer to current date:
+
+ - day
+ - week
+ - month
+ - year
+
+Additionally it is possible to state an offset. For example a start-date: `month-1` and end-date: `day+2` generates a report from beginning of last month until the end of the day after tomorrow.
+
 
 
 Use `ctrl+alt+[Period]` for promoting, or `ctrl+alt+[Comma]` for demoting text lines to 'done'-state or vice-versa.
