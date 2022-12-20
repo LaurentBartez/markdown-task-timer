@@ -42,13 +42,21 @@ export function activate(context: vscode.ExtensionContext) {
 		var offsetType: moment.unitOfTime.DurationConstructor = 'weeks';// TODO: initialization can probably be done better
 
 		// get the type of request
-		if (input.startsWith('week')) {
+		if (input.startsWith('day')) {
+			dateType = 'day';
+			offsetType = 'days';
+		}
+		else if (input.startsWith('week')) {
 			dateType = 'week';
 			offsetType = 'weeks';
 		}
 		else if (input.startsWith('month')) {
 			dateType = 'month';
 			offsetType = 'months';
+		}
+		else if (input.startsWith('year')) {
+			dateType = 'year';
+			offsetType = 'years';
 		}
 		
 		if (dateType && offsetType !== undefined ){
@@ -190,7 +198,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		var startDate = await vscode.window.showInputBox({
 			placeHolder: "YYYY-MM-DD",
-			prompt: "Enter start date for report",
+			prompt: "Enter start date for report. Use relative dates such as \"week\" or \"month-1\". Allowed Keywords are: day, week, month, year",
 			value: (moment(startDefault)).format('YYYY-MM-DD')
 		  });
 		
@@ -199,7 +207,7 @@ export function activate(context: vscode.ExtensionContext) {
 		{
 			endDate = await vscode.window.showInputBox({
 				placeHolder: "YYYY-MM-DD",
-				prompt: "Enter end date for report",
+				prompt: "Enter end date for report. Use relative dates such as \"week\" or \"month-1\". Allowed Keywords are: day, week, month, year",
 				value: (moment(endDefault)).format('YYYY-MM-DD')
 			});
 		}
