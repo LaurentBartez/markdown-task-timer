@@ -34,6 +34,50 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}
 
+	// This function gets the date from userInput. 
+	// Purpose is too handle user input in case of relative dates to the current one 
+	function getDateFromInput(input: string, isStartDate: boolean): string {
+		var result: string = "";
+		var dateType: moment.unitOfTime.StartOf = null;
+		var offsetType: moment.unitOfTime.DurationConstructor = 'weeks';// TODO: initialization can probably be done better
+
+		// get the type of request
+		if (input.startsWith('week')) {
+			dateType = 'week';
+			offsetType = 'weeks';
+		}
+		else if (input.startsWith('month')) {
+			dateType = 'month';
+			offsetType = 'months';
+		}
+		
+		if (dateType && offsetType !== undefined ){
+			// check offset
+			var sub: string[] = input.split('-');
+			var mom: moment.Moment = moment();
+			if (sub.length === 2){
+				mom = moment().subtract(sub[1], offsetType);
+			}
+			else{
+				sub = input.split('+');
+				if (sub.length === 2){
+					mom = moment().add(sub[1], offsetType);
+				}
+			}
+			if (isStartDate){
+				result = mom.startOf(dateType).format('YYYY-MM-DD');
+			}
+			else{
+				result = mom.endOf(dateType).format('YYYY-MM-DD');
+			}
+		}
+		else{
+			result = input;
+		}
+
+		return result;
+	}
+
 	// This function shall toggle a timer for a given task.
 	// if an active task is in editor it will be toggled whereever it is
 	// in case of no active task, the one in selected line will be toggled
@@ -144,7 +188,7 @@ export function activate(context: vscode.ExtensionContext) {
         var startDefault: Date = new Date("1900-01-01T00:00:00");
         var endDefault: Date = new Date(); 
 
-		const startDate = await vscode.window.showInputBox({
+		var startDate = await vscode.window.showInputBox({
 			placeHolder: "YYYY-MM-DD",
 			prompt: "Enter start date for report",
 			value: (moment(startDefault)).format('YYYY-MM-DD')
@@ -177,6 +221,8 @@ export function activate(context: vscode.ExtensionContext) {
 				if (tasks.length === 0) {
 					vscode.window.showErrorMessage('no tasks were found in workspace');
 				}
+				startDate = getDateFromInput(startDate,true);
+				endDate = getDateFromInput(endDate,false);
 
 				tasks.makeReport(new Date(startDate + "T00:00:00"), new Date(endDate + "T23:59:59"));
 			}
