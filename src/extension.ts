@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import TaskCollection from './taskcollection';
 import Task from './task';
 import TimerStatusBarItem from "./timerStatusBarItem";
-
+import * as moment from 'moment';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -19,8 +19,9 @@ export function activate(context: vscode.ExtensionContext) {
 		if (!activeEditor) {
 			return;
 		}
-
-		const tasks:TaskCollection = new TaskCollection(activeEditor.document);
+		var allDocs: vscode.TextDocument[] = new Array();
+		allDocs = [activeEditor.document];
+		const tasks:TaskCollection = new TaskCollection(allDocs);
 		const activeTasks = tasks.getActiveTasks();
 
 		if (activeTasks.length > 0)
@@ -33,6 +34,58 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}
 
+	// This function gets the date from userInput. 
+	// Purpose is too handle user input in case of relative dates to the current one 
+	function getDateFromInput(input: string, isStartDate: boolean): string {
+		var result: string = "";
+		var dateType: moment.unitOfTime.StartOf = null;
+		var offsetType: moment.unitOfTime.DurationConstructor = 'weeks';// TODO: initialization can probably be done better
+
+		// get the type of request
+		if (input.startsWith('day')) {
+			dateType = 'day';
+			offsetType = 'days';
+		}
+		else if (input.startsWith('week')) {
+			dateType = 'week';
+			offsetType = 'weeks';
+		}
+		else if (input.startsWith('month')) {
+			dateType = 'month';
+			offsetType = 'months';
+		}
+		else if (input.startsWith('year')) {
+			dateType = 'year';
+			offsetType = 'years';
+		}
+		
+		if (dateType && offsetType !== undefined ){
+			// check offset
+			var sub: string[] = input.split('-');
+			var mom: moment.Moment = moment();
+			if (sub.length === 2){
+				mom = moment().subtract(sub[1], offsetType);
+			}
+			else{
+				sub = input.split('+');
+				if (sub.length === 2){
+					mom = moment().add(sub[1], offsetType);
+				}
+			}
+			if (isStartDate){
+				result = mom.startOf(dateType).format('YYYY-MM-DD');
+			}
+			else{
+				result = mom.endOf(dateType).format('YYYY-MM-DD');
+			}
+		}
+		else{
+			result = input;
+		}
+
+		return result;
+	}
+
 	// This function shall toggle a timer for a given task.
 	// if an active task is in editor it will be toggled whereever it is
 	// in case of no active task, the one in selected line will be toggled
@@ -42,8 +95,10 @@ export function activate(context: vscode.ExtensionContext) {
 		const activeEditor = vscode.window.activeTextEditor;
 		if (!activeEditor) {
 			return;
-		}
-		const tasks: TaskCollection = new TaskCollection(activeEditor.document);
+		}		
+		var allDocs: vscode.TextDocument[] = new Array();
+		allDocs = [activeEditor.document];
+		const tasks:TaskCollection = new TaskCollection(allDocs);
 		const activeTasks = tasks.getActiveTasks();
 
 		const currentLine = activeEditor.selection.active.line;
@@ -121,21 +176,69 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	disposable = vscode.commands.registerCommand('markdown-task-timer.makeReport', () => {
-		
+
 		//check if selected line is a task
 		const activeEditor = vscode.window.activeTextEditor;
 		if (!activeEditor) {
 			return;
 		}
-		var tasks = new TaskCollection(activeEditor.document);
-		const timeTable: string = tasks.getTimeTables; 
-		vscode.workspace.openTextDocument({
-			content: timeTable,
-			language: "markdown"
-		}).then(newDocument => {
-			vscode.window.showTextDocument(newDocument);
-		});	});
+
+		var allDocs: vscode.TextDocument[] = new Array();
+		allDocs = [activeEditor.document];
+		const tasks: TaskCollection = new TaskCollection(allDocs);
+		tasks.makeReport(new Date("1900-01-01T00:00:00"),new Date());
+	});
 	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('markdown-task-timer.makeReportWorkspace',async () => {
+
+		// The code you place here will be executed every time your command is executed
+        var startDefault: Date = new Date("1900-01-01T00:00:00");
+        var endDefault: Date = new Date(); 
+
+		var startDate = await vscode.window.showInputBox({
+			placeHolder: "YYYY-MM-DD",
+			prompt: "Enter start date for report. Use relative dates such as \"week\" or \"month-1\". Allowed Keywords are: day, week, month, year",
+			value: (moment(startDefault)).format('YYYY-MM-DD')
+		  });
+		
+		var endDate;  
+		if (startDate)
+		{
+			endDate = await vscode.window.showInputBox({
+				placeHolder: "YYYY-MM-DD",
+				prompt: "Enter end date for report. Use relative dates such as \"week\" or \"month-1\". Allowed Keywords are: day, week, month, year",
+				value: (moment(endDefault)).format('YYYY-MM-DD')
+			});
+		}
+
+		if (startDate && endDate) {
+
+			const files = await vscode.workspace.findFiles('**/*.md', '**/node_modules/**');
+			var allDocs: vscode.TextDocument[] = new Array();
+			for (const file of files) {
+				const doc = await vscode.workspace.openTextDocument(file.path);
+				allDocs.push(doc);
+			};
+
+			if (allDocs.length === 0) {
+				vscode.window.showErrorMessage('no markdown files were found in workspace');
+			}
+			else {
+				const tasks: TaskCollection = new TaskCollection(allDocs);
+				if (tasks.length === 0) {
+					vscode.window.showErrorMessage('no tasks were found in workspace');
+				}
+				startDate = getDateFromInput(startDate,true);
+				endDate = getDateFromInput(endDate,false);
+
+				tasks.makeReport(new Date(startDate + "T00:00:00"), new Date(endDate + "T23:59:59"));
+			}
+		}
+
+	});
+	context.subscriptions.push(disposable);
+
 
 	disposable = vscode.commands.registerCommand('markdown-task-timer.GoToActiveTask', () => {
 		
@@ -169,7 +272,9 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const taskDeco: vscode.DecorationOptions[] = [];
-		const tasks:TaskCollection = new TaskCollection(activeEditor.document);
+		var allDocs: vscode.TextDocument[] = new Array();
+		allDocs = [activeEditor.document];
+		const tasks:TaskCollection = new TaskCollection(allDocs);
 
 		tasks.forEach(element => {
 			if (element.isActive){

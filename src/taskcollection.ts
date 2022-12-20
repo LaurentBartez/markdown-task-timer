@@ -6,7 +6,7 @@ import { Align, getMarkdownTable } from 'markdown-table-ts';
 
 
 class TaskCollection extends Array<Task> {
-    _document: vscode.TextDocument;
+    _document: vscode.TextDocument[];
 
     public getActiveTasks(): Task[]{
 		let activeTasks:Task[] = [];
@@ -18,7 +18,7 @@ class TaskCollection extends Array<Task> {
 		return activeTasks;
 	}
 
-	get getTimeTables(){
+	public getTimeTables(startDate: Date, endDate: Date){
 		const dataForge = require('data-forge');
 		function getMd(df: any){
 			df = df.withSeries({
@@ -39,61 +39,62 @@ class TaskCollection extends Array<Task> {
 
 			return getMarkdownTable(tableData);
 		};
-
-		var df = new dataForge.DataFrame({columns:this.getEntries});
-		df = df.orderBy((row: { startEntry: any; }) => row.startEntry);
-		console.log(df.toArray());
-		const startDays = df.getSeries('startDay');
-		const uniqueDays = startDays.distinct();
-
-		// make dailies
-		var timeTable:string = "";
-		var durationTable:string = "";
-
-		uniqueDays.forEach((day: any) => {
-			var filtered = df.where((row:any) => row.startDay === day);
-			const sum = filtered.getSeries('duration').sum().toFixed(2);
-			
-			timeTable += "### " + day.toString() + "\n\n";
-			
-			timeTable += getMd(filtered.subset(['title','start','end','duration']));
-			timeTable += "\n\n";
-			timeTable += "Total duration: " + sum + "h\n\n";
-
-			durationTable += "### " + day.toString() + "\n\n";
-			
-			const pivotted = filtered.pivot("title", "duration", (series: { sum: () => any; }) => series.sum());
-			durationTable += getMd(pivotted.subset(['title','duration']));
-			durationTable += "\n\n";
-			durationTable += "Total duration: " + sum + "h\n\n";
-
-		});
-
-		// make total
-		var totalDuration:string = "";
-		const pivottedTotal = df.pivot("title", "duration", (series: { sum: () => any; }) => series.sum());
-		totalDuration += getMd(pivottedTotal.subset(['title','duration']));
-		totalDuration += "\n\n";
-
+		var df = new dataForge.DataFrame({columns:this.getEntries(startDate,endDate)});
 		var table: string = "# Report";
-		table += "\n\n";
-		table += "## Daily log";
-		table += "\n\n";
-		table += timeTable;
-		table += "\n";
-		table += "## Daily duration";
-		table += "\n\n";
-		table += durationTable;
-		table += "\n";
-		table += "## Total duration";
-		table += "\n\n";
-		table += totalDuration;
 
+		if (df.count()  > 0)
+		{
+			df = df.orderBy((row: { startEntry: any; }) => row.startEntry);
+			console.log(df.toArray());
+			const startDays = df.getSeries('startDay');
+			const uniqueDays = startDays.distinct();
+			// make dailies
+			var timeTable: string = "";
+			var durationTable: string = "";
 
+			uniqueDays.forEach((day: any) => {
+				var filtered = df.where((row: any) => row.startDay === day);
+				const sum = filtered.getSeries('duration').sum().toFixed(2);
+
+				timeTable += "### " + day.toString() + "\n\n";
+
+				timeTable += getMd(filtered.subset(['title', 'start', 'end', 'duration']));
+				timeTable += "\n\n";
+				timeTable += "Total duration: " + sum + "h\n\n";
+
+				durationTable += "### " + day.toString() + "\n\n";
+
+				const pivotted = filtered.pivot("title", "duration", (series: { sum: () => any; }) => series.sum());
+				durationTable += getMd(pivotted.subset(['title', 'duration']));
+				durationTable += "\n\n";
+				durationTable += "Total duration: " + sum + "h\n\n";
+
+			});
+
+			// make total
+			var totalDuration: string = "";
+			const pivottedTotal = df.pivot("title", "duration", (series: { sum: () => any; }) => series.sum());
+			totalDuration += getMd(pivottedTotal.subset(['title', 'duration']));
+			totalDuration += "\n\n";
+
+			table += "\n\n";
+			table += "## Daily log";
+			table += "\n\n";
+			table += timeTable;
+			table += "\n";
+			table += "## Daily duration";
+			table += "\n\n";
+			table += durationTable;
+			table += "\n";
+			table += "## Total duration";
+			table += "\n\n";
+			table += totalDuration;
+
+		}
 		return table;
 	}
 
-	get getEntries(){
+	private getEntries(start: Date, end: Date){
 		var titles:string[] =[];
 		var starts: string[] =[];
 		var ends: string[] =[];
@@ -102,23 +103,26 @@ class TaskCollection extends Array<Task> {
 		var startDays:string[]  =[];
 
 
-		this.forEach(task=>{
+		this.forEach(task => {
 			var timeEntries = task.getTable;
-			timeEntries.forEach(element=>{
-				
+			timeEntries.forEach(element => {
+
+				if (element._start >= start && element._start <= end) {
+
 					titles.push(task.getTitle);
 					starts.push(moment(element._start.getTime()).format('HH:mm'));
-					if (element._end !== null){
+					if (element._end !== null) {
 						ends.push(moment(element._end.getTime()).format('HH:mm'));
 					}
-					else{
+					else {
 						ends.push("");
 					}
 					durations.push(element._durationMs / 1000 / 60 / 60);
 					startDays.push(moment(element._start.getTime()).format('YYYY-MM-DD'));
 					startEntries.push(element._start.getTime());
+				}
 
-				
+
 			});
 		});
 		var data ={
@@ -131,23 +135,37 @@ class TaskCollection extends Array<Task> {
 		};
 		return data;
 	}
-    private getTasks(){
-		var tasks:Task[] = [];
-		const regEx = /- \[x\]|- \[ \]/g;
-		const text = this._document.getText();
 
-		let match;
-		const taskDeco: vscode.DecorationOptions[] = [];
-
-		while ((match = regEx.exec(text))) {
- 
-			const startPos = this._document.positionAt(match.index);
-			const endPos = this._document.lineAt(startPos).range.end;
-
-			this.push(new Task(this._document,new vscode.Range(startPos, endPos)));
-		}		
+	public makeReport(startDate: Date, endDate:Date){
+		const timeTable: string = this.getTimeTables(startDate, endDate);
+		vscode.workspace.openTextDocument({
+			content: timeTable,
+			language: "markdown"
+		}).then(newDocument => {
+			vscode.window.showTextDocument(newDocument);
+		});
 	}
-    constructor(document: vscode.TextDocument,...items: Task[]) {
+
+	private getTasks() {
+		var tasks: Task[] = [];
+		const regEx = /- \[x\]|- \[ \]/g;
+		this._document.forEach(doc => {
+
+			const text = doc.getText();
+
+			let match;
+			const taskDeco: vscode.DecorationOptions[] = [];
+
+			while ((match = regEx.exec(text))) {
+
+				const startPos = doc.positionAt(match.index);
+				const endPos = doc.lineAt(startPos).range.end;
+
+				this.push(new Task(doc, new vscode.Range(startPos, endPos)));
+			}
+		});		
+	}
+    constructor(document: vscode.TextDocument[],...items: Task[]) {
         super(...items);
         this._document = document || null;
         this.getTasks();

@@ -50,7 +50,10 @@ class TimerStatusBarItem {
 
   public updateTimer(document: vscode.TextDocument) {
 		if (this.updateIsPossible(document)) {
-      const tasks:TaskCollection = new TaskCollection(document);
+      var allDocs: vscode.TextDocument[] = new Array();
+      allDocs = [document];
+      const tasks:TaskCollection = new TaskCollection(allDocs);
+  
 			const activeTasks = tasks.getActiveTasks();
 			if (activeTasks.length === 0)
 			{
