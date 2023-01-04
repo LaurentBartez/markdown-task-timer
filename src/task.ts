@@ -194,25 +194,32 @@ class Task {
         
         return text; 
     }
-    public promote(){
+    public promote() : vscode.TextEdit {
         var newStatus: number;
         if (this._state === 3){
-            this.toggleStatus(0);
+            newStatus = 0;
         }
         else{
-            this.toggleStatus(this._state + 1);
+            newStatus = this._state + 1;
         }
+        const tEdit = this.editStatusText(newStatus);
+        this._state = newStatus;
+        return tEdit;    
     }
 
-    public demote(){
+    public demote() : vscode.TextEdit {
         var newStatus: number;
         if (this._state === 0){
-            this.toggleStatus(3);
+            newStatus = 3;
         }
         else{
-            this.toggleStatus(this._state - 1);
+            newStatus = this._state - 1;
         }
+        const tEdit = this.editStatusText(newStatus);
+        this._state = newStatus;
+        return tEdit;     
     }
+
     public goToTask(){
         var openPath = vscode.Uri.file(this.fileName);
         vscode.workspace.openTextDocument(openPath).then(doc => {
@@ -223,7 +230,7 @@ class Task {
     });
 }
 
-    public toggleStatus(newStatus: number){
+    public editStatusText(newStatus: number) : vscode.TextEdit {
             var prefix = this.taskPrefix(this._state);
             var start;
             var end;
@@ -241,14 +248,7 @@ class Task {
             }
             const rgToReplace = new vscode.Range(start,end);
             const newPrefix = this.taskPrefix(newStatus);
-
-            const textEdits: vscode.TextEdit[] = [];
-            var tEdit = new vscode.TextEdit(rgToReplace, newPrefix);
-            textEdits.push(tEdit);
-            const workEdit = new vscode.WorkspaceEdit();
-            workEdit.set(this._document.uri,textEdits);
-            vscode.workspace.applyEdit(workEdit);
-            this._state = newStatus;
+            return new vscode.TextEdit(rgToReplace, newPrefix);
     }
     private taskPrefix(status:number):string{
         var prefix: string = "";
