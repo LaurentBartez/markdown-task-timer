@@ -30,7 +30,7 @@ Additionally it is possible to state an offset. For example a start-date: `month
 
 
 
-Use `ctrl+alt+[Period]` for promoting, or `ctrl+alt+[Comma]` for demoting text lines to 'done'-state or vice-versa.
+Use `ctrl+alt+[Period]` for promoting, or `ctrl+alt+[Comma]` for demoting text lines to 'done'-state or vice-versa. Supports multicursor operations.
 
 ![cycle status](images/cycle.gif)
 

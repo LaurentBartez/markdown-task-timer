@@ -38,6 +38,7 @@ class TimerStatusBarItem {
       activeTask.insertTimeStamp();
       doc.save();
     });
+    this.removeTask();
   }
 
   public removeTask() {
