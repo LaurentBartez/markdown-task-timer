@@ -140,7 +140,7 @@ export function activate(context: vscode.ExtensionContext) {
 						const rangeInStatusBar = statusBarItem.range;
 						statusBarItem.removeTaskAndInsertTimeStamp();
 						vscode.window
-						.showInformationMessage("Stopped a task in a different file. Toggle timer again to start this one.", "Go to stopped task")
+						.showInformationMessage("Stopped a task in another file. Toggle timer again to start this one.", "Go to stopped task")
 						.then(answer => {
 							if (answer === "Go to stopped task") {
 								vscode.workspace.openTextDocument(fileInStatusBar).then(doc => {
