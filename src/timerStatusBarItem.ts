@@ -30,13 +30,14 @@ class TimerStatusBarItem {
       });
   }
 
-  public removeTaskAndInsertTimeStamp() {
+  async removeTaskAndInsertTimeStamp() {
     var openPath = vscode.Uri.file(this._fileName);
     
-    vscode.workspace.openTextDocument(openPath).then(doc => {
+    await vscode.workspace.openTextDocument(openPath).then(doc => {
       const activeTask = new Task(doc,this._range);
       activeTask.insertTimeStamp();
       doc.save();
+      this.removeTask();
     });
   }
 
