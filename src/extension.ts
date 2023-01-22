@@ -19,19 +19,30 @@ export function activate(context: vscode.ExtensionContext) {
 		if (!activeEditor) {
 			return;
 		}
-		var allDocs: vscode.TextDocument[] = new Array();
-		allDocs = [activeEditor.document];
-		const tasks:TaskCollection = new TaskCollection(allDocs);
-		const activeTasks = tasks.getActiveTasks();
+		getWorkspaceDocuments().then(allDocs => {
+			const tasks:TaskCollection = new TaskCollection(allDocs);
+			const activeTasks = tasks.getActiveTasks();
+	
+			if (activeTasks.length > 0)
+			{
+				statusBarItem.setTask(activeTasks[0]);
+			}
+			else
+			{
+				statusBarItem.removeTask();
+			}
+		});
+		
+	}
 
-		if (activeTasks.length > 0)
-		{
-			statusBarItem.setTask(activeTasks[0]);
-		}
-		else
-		{
-			statusBarItem.removeTask();
-		}
+	async function getWorkspaceDocuments() : Promise<vscode.TextDocument[]> {
+		const files = await vscode.workspace.findFiles('**/*.md', '**/node_modules/**');
+		var allDocs: vscode.TextDocument[] = new Array();
+		for (const file of files) {
+			const doc = await vscode.workspace.openTextDocument(file.path);
+			allDocs.push(doc);
+		};
+		return allDocs;
 	}
 
 	// This function gets the date from userInput. 
@@ -114,7 +125,7 @@ export function activate(context: vscode.ExtensionContext) {
 						const fileInStatusBar = statusBarItem.fileName;
 						const rangeInStatusBar = statusBarItem.range;
 						statusBarItem.removeTaskAndInsertTimeStamp().then(() => vscode.window
-						.showInformationMessage("Stopped a task in another file. Toggle timer again to start this one.", "Go to stopped task")
+						.showInformationMessage("Stopped a task in another file. Toggle timer again to start task in current line.", "Go to stopped task")
 						.then(answer => {
 							if (answer === "Go to stopped task") {
 									vscode.workspace.openTextDocument(fileInStatusBar).then(doc => {
@@ -195,13 +206,13 @@ export function activate(context: vscode.ExtensionContext) {
         var startDefault: Date = new Date("1900-01-01T00:00:00");
         var endDefault: Date = new Date(); 
 
-		var startDate = await vscode.window.showInputBox({
+		var startDate : any = await vscode.window.showInputBox({
 			placeHolder: "YYYY-MM-DD",
 			prompt: "Enter start date for report. Use relative dates such as \"week\" or \"month-1\". Allowed Keywords are: day, week, month, year",
 			value: (moment(startDefault)).format('YYYY-MM-DD')
 		  });
 		
-		var endDate;  
+		var endDate : any;  
 		if (startDate)
 		{
 			endDate = await vscode.window.showInputBox({
@@ -213,26 +224,22 @@ export function activate(context: vscode.ExtensionContext) {
 
 		if (startDate && endDate) {
 
-			const files = await vscode.workspace.findFiles('**/*.md', '**/node_modules/**');
-			var allDocs: vscode.TextDocument[] = new Array();
-			for (const file of files) {
-				const doc = await vscode.workspace.openTextDocument(file.path);
-				allDocs.push(doc);
-			};
-
-			if (allDocs.length === 0) {
-				vscode.window.showErrorMessage('no markdown files were found in workspace');
-			}
-			else {
-				const tasks: TaskCollection = new TaskCollection(allDocs);
-				if (tasks.length === 0) {
-					vscode.window.showErrorMessage('no tasks were found in workspace');
+			getWorkspaceDocuments().then(allDocs  => {
+				if (allDocs.length === 0) {
+					vscode.window.showErrorMessage('no markdown files were found in workspace');
 				}
-				startDate = getDateFromInput(startDate,true);
-				endDate = getDateFromInput(endDate,false);
+				else {
+					const tasks: TaskCollection = new TaskCollection(allDocs);
+					if (tasks.length === 0) {
+						vscode.window.showErrorMessage('no tasks were found in workspace');
+					}
+					startDate = getDateFromInput(startDate,true);
+					endDate = getDateFromInput(endDate,false);
+	
+					tasks.makeReport(new Date(startDate + "T00:00:00"), new Date(endDate + "T23:59:59"));
+				}
+			});
 
-				tasks.makeReport(new Date(startDate + "T00:00:00"), new Date(endDate + "T23:59:59"));
-			}
 		}
 
 	});
