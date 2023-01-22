@@ -39,6 +39,7 @@ class TimerStatusBarItem {
       doc.save();
       this.removeTask();
     });
+    this.removeTask();
   }
 
   public removeTask() {

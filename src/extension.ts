@@ -97,6 +97,31 @@ export function activate(context: vscode.ExtensionContext) {
 		return result;
 	}
 
+	// This function toggles the task status in the active editor
+	// @param promoteDemote: use 'true' for promote; 'false' for demote
+	function toggleStatusInEditor(promoteDemote : boolean){
+		const activeEditor = vscode.window.activeTextEditor;
+		if (!activeEditor) {
+			return;
+		}
+		const selections = activeEditor.selections;
+		const textEdits: vscode.TextEdit[] = [];
+		selections.forEach(element => {
+			var line = element.active.line;
+			const task = new Task(activeEditor.document,activeEditor.document.lineAt(line).range);
+			if (promoteDemote){
+				textEdits.push(task.promote());
+			}
+			else{
+				textEdits.push(task.demote());
+			}
+		});
+		const workEdit = new vscode.WorkspaceEdit();
+		workEdit.set(activeEditor.document.uri,textEdits);
+		vscode.workspace.applyEdit(workEdit);
+	};
+
+
 	// This function shall toggle a timer for a given task.
 	// if an active task is in editor it will be toggled whereever it is
 	// in case of no active task, the one in selected line will be toggled
@@ -157,33 +182,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 	disposable = vscode.commands.registerCommand('markdown-task-timer.promoteTask', () => {
-		
-		//check if selected line is a task
-		const activeEditor = vscode.window.activeTextEditor;
-		if (!activeEditor) {
-			return;
-		}
-
-		const task = new Task(activeEditor.document,activeEditor.document.lineAt(activeEditor.selection.active.line).range);
-		task.promote();
-
+		toggleStatusInEditor(true);
 	});
 	context.subscriptions.push(disposable);
 	
 	disposable = vscode.commands.registerCommand('markdown-task-timer.demoteTask', () => {
-		
-		//check if selected line is a task
-		const activeEditor = vscode.window.activeTextEditor;
-		if (!activeEditor) {
-			return;
-		}
-
-		const task = new Task(activeEditor.document,activeEditor.document.lineAt(activeEditor.selection.active.line).range);
-		task.demote();
-
+		toggleStatusInEditor(false);
 	});
 	context.subscriptions.push(disposable);
-
 
 	disposable = vscode.commands.registerCommand('markdown-task-timer.makeReport', () => {
 
