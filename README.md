@@ -12,7 +12,7 @@ Add timers to your markdown task-list and get a report summarizing your efforts.
 
 ## Usage
 
-Place cursor in a line with a markdown task and press `ctrl+alt+l` to add a timestamp. Existing active tasks will be set inactive before a new one is activated. A timer in the status bar indicates the elapsed time of the current active task.
+Place cursor in a line with a markdown task and press `ctrl+alt+l` to add a timestamp. Existing active tasks will be set inactive before a new one is activated. A timer in the status bar indicates the elapsed time of the current active task. You can click on the timer to find the active task in your workspace.
 
 ![add timer](images/log.gif)
 
@@ -33,17 +33,6 @@ Additionally it is possible to state an offset. For example a start-date: `month
 Use `ctrl+alt+[Period]` for promoting, or `ctrl+alt+[Comma]` for demoting text lines to 'done'-state or vice-versa. Supports multicursor operations.
 
 ![cycle status](images/cycle.gif)
-
-## Release Notes
-
-### 0.2.0
-
-official release
-
-
-### 0.1.0
-
-Initial preview release
 
 ## For more information
 

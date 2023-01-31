@@ -4,7 +4,7 @@
 
 ### Features
 
-- Click on timer selects task in editor. Files are opened if required.
+- Click on timer selects task in editor. Files are opened if required
 - Added report for whole workspace including setting of start dates and end dates
 - Added multicursor support for task cycling
 ### Bugfixes
